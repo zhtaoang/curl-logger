@@ -3,8 +3,6 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
-
     <groupId>com.dzieciou.testing</groupId>
     <artifactId>curl-logger</artifactId>
     <version>0.1-SNAPSHOT</version>
@@ -17,6 +15,12 @@
         <system>GitHub Issue Tracking</system>
         <url/>
     </issueManagement>
+    <licenses>
+        <license>
+            <name>BSD License, Revised</name>
+            <url>https://opensource.org/licenses/BSD-3-Clause</url>
+        </license>
+    </licenses>
     <developers>
         <developer>
             <name>Maciej Gawinecki</name>
@@ -74,8 +78,6 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-
     <profiles>
         <profile>
             <id>release</id>
@@ -136,12 +138,15 @@
             </build>
         </profile>
     </profiles>
-
     <distributionManagement>
         <snapshotRepository>
             <id>ossrh</id>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
     </distributionManagement>
-
+    <scm>
+        <connection>scm:git:git@github.com:dzieciou/curl-logger.git</connection>
+        <developerConnection>scm:git:git@github.com:dzieciou/curl-logger.git</developerConnection>
+        <url>git@github.com:dzieciou/curl-logger.git</url>
+    </scm>
 </project>
