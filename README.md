@@ -16,11 +16,13 @@ reproduce the issue and isolate its root cause.
 
 Latest snapshot:
 
-    <dependency>
-        <groupId>com.github.dzieciou.testing</groupId>
-        <artifactId>curl-logger</artifactId>
-        <version>0.1-SNAPSHOT</version>
-    </dependency>
+```xml
+<dependency>
+  <groupId>com.github.dzieciou.testing</groupId>
+  <artifactId>curl-logger</artifactId>
+  <version>0.1-SNAPSHOT</version>
+</dependency>
+```
 
 Available from this repository: 
 
@@ -28,31 +30,35 @@ Available from this repository:
     
 When creating HTTP client instance, you must configure it to use CurlLoggingInterceptor:
     
-    private static class MyHttpClientFactory implements HttpClientConfig.HttpClientFactory {
+```java
+private static class MyHttpClientFactory implements HttpClientConfig.HttpClientFactory {
 
-        @Override
-        public HttpClient createHttpClient() {
-            AbstractHttpClient client = new DefaultHttpClient();
-            client.addRequestInterceptor(new CurlLoggingInterceptor());
-            return client;
-        }
-    }
+  @Override
+  public HttpClient createHttpClient() {
+    AbstractHttpClient client = new DefaultHttpClient();
+    client.addRequestInterceptor(new CurlLoggingInterceptor());
+    return client;
+  }
+}
+```    
 
 and use it in th test:
-    
-    @Test
-    public void test() throws IOException {
 
-        given()
-            .redirects().follow(false)
-            .config(config()
-                .httpClient(httpClientConfig()
-                    .reuseHttpClientInstance().httpClientFactory(new MyHttpClientFactory())))
-        .when()
-            .get("http://google.com")
-        .then()
-            .statusCode(302); 
-    }
+```java  
+@Test
+public void test() throws IOException {
+
+  given()
+    .redirects().follow(false)
+    .config(config()
+      .httpClient(httpClientConfig()
+        .reuseHttpClientInstance().httpClientFactory(new MyHttpClientFactory())))
+  .when()
+    .get("http://google.com")
+  .then()
+    .statusCode(302); 
+}
+```
 
 # Prerequisities
 
@@ -60,7 +66,7 @@ and use it in th test:
 
 # Bugs and features request
 
-Report in [JIRA][2]
+Report or request in [JIRA][2].
 
   [1]: https://curl.haxx.se/
   [2]: https://github.com/dzieciou/curl-logger/issues
