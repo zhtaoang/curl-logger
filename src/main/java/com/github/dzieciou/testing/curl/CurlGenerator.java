@@ -29,7 +29,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.dzieciou.testing.curl;
+package com.github.dzieciou.testing.curl;
 
 import com.google.common.collect.ImmutableSet;
 import org.apache.http.Header;

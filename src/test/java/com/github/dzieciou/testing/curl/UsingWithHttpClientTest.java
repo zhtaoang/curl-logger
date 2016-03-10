@@ -1,4 +1,4 @@
-package com.dzieciou.testing.curl;
+package com.github.dzieciou.testing.curl;
 
 
 import org.apache.http.client.HttpClient;
