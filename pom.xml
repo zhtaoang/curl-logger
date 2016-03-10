@@ -10,7 +10,7 @@
     <version>0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
     <url>https://github.com/dzieciou/curl-logger</url>
-    <name>CURL Logger</name>
+    <name>com.dzieciou.testing:curl-logger</name>
     <description>Logs Apache HTTP client requests as curl commands</description>
     <inceptionYear>2016</inceptionYear>
     <issueManagement>
