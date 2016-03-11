@@ -16,7 +16,7 @@ import static com.jayway.restassured.config.HttpClientConfig.httpClientConfig;
 public class UsingWithRestAssuredTest {
 
     @Test(groups = "end-to-end-samples")
-    public void test() throws IOException {
+    public void test()  {
 
         //@formatter:off
         given()
