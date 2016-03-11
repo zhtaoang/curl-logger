@@ -7,8 +7,6 @@ import org.apache.http.impl.client.AbstractHttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.testng.annotations.Test;
 
-import java.io.IOException;
-
 import static com.jayway.restassured.RestAssured.config;
 import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.config.HttpClientConfig.httpClientConfig;
