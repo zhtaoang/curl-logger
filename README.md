@@ -67,6 +67,22 @@ given()
 ...
 ```
 
+CURL commands are logged to a "curl" logger. The library requires only the logger to be [slf4j][4]-compliant, e.g.,
+using [logback][5]. Sample logback configuration that logs all CURL commands to standard system output would be:
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%-4relative [%thread] %-5level %logger{35} - %msg %n</pattern>
+        </encoder>
+    </appender>
+    <logger name="curl" level="DEBUG">
+        <appender-ref ref="STDOUT"/>
+    </logger>
+</configuration>
+```
+
 ## Prerequisities
 
 * JDK 8
@@ -84,3 +100,5 @@ Report or request in [JIRA][2].
   [1]: https://curl.haxx.se/
   [2]: https://github.com/dzieciou/curl-logger/issues
   [3]: https://github.com/mrmike/Ok2Curl 
+  [4]: http://www.slf4j.org/
+  [5]: http://logback.qos.ch/
