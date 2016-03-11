@@ -15,13 +15,13 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
 @Test(groups = "unit")
-public class CurlGeneratorTest {
+public class Http2CurlTest {
 
     @Test
     public void shouldPrintGetRequestProperly() throws Exception {
         HttpGet getRequest = new HttpGet("http://test.com:8080/items/query?x=y#z");
         assertThat("curl 'http://test.com:8080/items/query?x=y#z' --compressed",
-                equalTo(CurlGenerator.generateCurl(getRequest)));
+                equalTo(Http2Curl.generateCurl(getRequest)));
     }
 
     @Test
@@ -34,7 +34,7 @@ public class CurlGeneratorTest {
         posttRequest.setEntity(new UrlEncodedFormEntity(postParameters));
         posttRequest.setHeader("Content-Type", "application/x-www-form-urlencoded");
         assertThat("curl 'http://google.pl/' -H 'Content-Type: application/x-www-form-urlencoded' --data 'param1=param1_value&param2=param2_value' --compressed",
-                equalTo(CurlGenerator.generateCurl(posttRequest)));
+                equalTo(Http2Curl.generateCurl(posttRequest)));
     }
 
     @Test
@@ -46,14 +46,14 @@ public class CurlGeneratorTest {
     public void shouldPrintDeleteRequestProperly() throws Exception {
         HttpDelete deleteRequest = new HttpDelete("http://test.com/items/12345");
         assertThat("curl 'http://test.com/items/12345' -X DELETE --compressed",
-                equalTo(CurlGenerator.generateCurl(deleteRequest)));
+                equalTo(Http2Curl.generateCurl(deleteRequest)));
     }
 
     @Test
     public void shouldPrintHeadRequestProperly() throws Exception {
         HttpHead headRequest = new HttpHead("http://test.com/items/12345");
         assertThat("curl 'http://test.com/items/12345' -X HEAD --compressed",
-                equalTo(CurlGenerator.generateCurl(headRequest)));
+                equalTo(Http2Curl.generateCurl(headRequest)));
     }
 
     @Test
@@ -62,7 +62,7 @@ public class CurlGeneratorTest {
         putRequest.setEntity(new StringEntity("details={\"name\":\"myname\",\"age\":\"20\"}"));
         putRequest.setHeader("Content-Type", "application/json");
         assertThat("curl 'http://test.com/items/12345' -X PUT -H 'Content-Type: application/json' --data 'details={\"name\":\"myname\",\"age\":\"20\"}' --compressed",
-                equalTo(CurlGenerator.generateCurl(putRequest)));
+                equalTo(Http2Curl.generateCurl(putRequest)));
     }
 
 }

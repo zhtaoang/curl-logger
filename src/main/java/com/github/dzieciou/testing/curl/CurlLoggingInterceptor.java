@@ -21,7 +21,7 @@ public class CurlLoggingInterceptor implements HttpRequestInterceptor {
     @Override
     public void process(HttpRequest request, HttpContext context) throws HttpException, IOException {
         try {
-            log.debug(CurlGenerator.generateCurl(request));
+            log.debug(Http2Curl.generateCurl(request));
         } catch (Exception e) {
             log.warn("Failed to generate CURL command for HTTP request", e);
         }
