@@ -16,9 +16,6 @@ The following request from REST-Assured test
 ```java  
 given()
   .redirects().follow(false)
-  .config(config()
-    .httpClient(httpClientConfig()
-      .reuseHttpClientInstance().httpClientFactory(new MyHttpClientFactory())))
 .when()
   .get("http://google.com")
 .then()
