@@ -1,18 +1,38 @@
-# curl-logger
+# CURL Logger
 
-Enables logging each HTTP request sent by the Apache HTTP client as a CURL command.
+Logs each HTTP request sent by the Apache HTTP client as a [CURL][1] command.
 
-[cURL][1] is a popular command line tool used for transferring data using various protocol. For
-example, to request a HTTP resource:
+The following HTTP request
+```java  
+HttpGet getRequest = new HttpGet("http://google.com");
+createHttpClient().execute(getRequest);
+```
+will be logged as:
+```
+curl 'http://google.com/' --compressed 
+```
 
-    curl 'https://www.google.com/' -H 'Accept: ' -H 'Host:www.google.com' -H 'Connection:Keep-Alive' 
-    -H 'User-Agent:Apache-HttpClient/4.2.6(java1.5)' --compressed
+The following request from REST-Assured test
+```java  
+  given()
+    .redirects().follow(false)
+    .config(config()
+      .httpClient(httpClientConfig()
+        .reuseHttpClientInstance().httpClientFactory(new MyHttpClientFactory())))
+  .when()
+    .get("http://google.com")
+  .then()
+    .statusCode(302); 
+}
+```
+will be logged as:
+```
+curl 'http://google.com/' -H 'Accept: */*' -H 'Content-Length: 0' -H 'Host: google.com' -H 'Connection: Keep-Alive' -H 'User-Agent: Apache-HttpClient/4.5.1 (Java/1.8.0_45)' --compressed 
+```
 
-As a tool reproducing issues and bugs it has become so popular that Chrome browser team has
-added "Copy as CURL" action to their browser's network panel. This way a tester and a developer can quickly
-reproduce the issue and isolate its root cause. 
+This way testers and developers can quickly reproduce an issue and isolate its root cause. 
 
-# Usage
+## Usage
 
 Latest snapshot:
 
@@ -27,6 +47,8 @@ Latest snapshot:
 Available from this repository: 
 
     https://oss.sonatype.org/content/repositories/snapshots/
+   
+### Using with REST-Assured client 
     
 When creating HTTP client instance, you must configure it to use CurlLoggingInterceptor:
     
@@ -41,34 +63,29 @@ private static class MyHttpClientFactory implements HttpClientConfig.HttpClientF
   }
 }
 ```    
-
-and use it in th test:
-
+and use it in the test:
 ```java  
-@Test
-public void test() throws IOException {
-
-  given()
-    .redirects().follow(false)
-    .config(config()
-      .httpClient(httpClientConfig()
-        .reuseHttpClientInstance().httpClientFactory(new MyHttpClientFactory())))
-  .when()
-    .get("http://google.com")
-  .then()
-    .statusCode(302); 
-}
+given()
+  .config(config()
+    .httpClient(httpClientConfig()
+      .reuseHttpClientInstance().httpClientFactory(new MyHttpClientFactory())))
+...
 ```
 
-# Prerequisities
+## Prerequisities
 
 * JDK 8
 
-# Bugs and features request
+## Bugs and features request
 
 Report or request in [JIRA][2].
 
+## Similar tools
+  
+* Chrome Web browser team has added "Copy as CURL" action to their browser's network panel.
+* OkHttp client provides similar request [interceptor][3] to log HTTP requests as curl command. 
+
+
   [1]: https://curl.haxx.se/
   [2]: https://github.com/dzieciou/curl-logger/issues
-    
-   
+  [3]: https://github.com/mrmike/Ok2Curl 
