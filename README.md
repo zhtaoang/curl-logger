@@ -14,16 +14,15 @@ curl 'http://google.com/' --compressed
 
 The following request from REST-Assured test
 ```java  
-  given()
-    .redirects().follow(false)
-    .config(config()
-      .httpClient(httpClientConfig()
-        .reuseHttpClientInstance().httpClientFactory(new MyHttpClientFactory())))
-  .when()
-    .get("http://google.com")
-  .then()
-    .statusCode(302); 
-}
+given()
+  .redirects().follow(false)
+  .config(config()
+    .httpClient(httpClientConfig()
+      .reuseHttpClientInstance().httpClientFactory(new MyHttpClientFactory())))
+.when()
+  .get("http://google.com")
+.then()
+  .statusCode(302); 
 ```
 will be logged as:
 ```
@@ -50,11 +49,10 @@ Available from this repository:
    
 ### Using with REST-Assured client 
     
-When creating HTTP client instance, you must configure it to use CurlLoggingInterceptor:
+When creating HTTP client instance, you must configure it to use `CurlLoggingInterceptor`:
     
 ```java
 private static class MyHttpClientFactory implements HttpClientConfig.HttpClientFactory {
-
   @Override
   public HttpClient createHttpClient() {
     AbstractHttpClient client = new DefaultHttpClient();
@@ -82,7 +80,7 @@ Report or request in [JIRA][2].
 
 ## Similar tools
   
-* Chrome Web browser team has added "Copy as CURL" action to their browser's network panel.
+* Chrome Web browser team has "Copy as CURL" in the network panel.
 * OkHttp client provides similar request [interceptor][3] to log HTTP requests as curl command. 
 
 
