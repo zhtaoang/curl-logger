@@ -38,11 +38,6 @@ public class Http2CurlTest {
     }
 
     @Test
-    public void shouldPrintPostRequestWithBinaryDataProperly() {
-        // TODO
-    }
-
-    @Test
     public void shouldPrintDeleteRequestProperly() throws Exception {
         HttpDelete deleteRequest = new HttpDelete("http://test.com/items/12345");
         assertThat("curl 'http://test.com/items/12345' -X DELETE --compressed",
