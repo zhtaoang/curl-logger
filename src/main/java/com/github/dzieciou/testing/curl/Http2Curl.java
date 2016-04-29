@@ -33,15 +33,22 @@ package com.github.dzieciou.testing.curl;
 
 import com.google.common.collect.ImmutableSet;
 import org.apache.http.Header;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpRequest;
 import org.apache.http.client.methods.HttpRequestWrapper;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.mime.FormBodyPart;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.impl.client.EntityEnclosingRequestWrapper;
+import com.jayway.restassured.internal.multipart.*;
 import org.apache.http.impl.client.RequestWrapper;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -107,8 +114,21 @@ public class Http2Curl {
         if (request instanceof HttpEntityEnclosingRequest) {
             HttpEntityEnclosingRequest requestWithEntity = (HttpEntityEnclosingRequest) request;
             try {
-                if (requestWithEntity.getEntity() != null) {
-                    formData = Optional.of(EntityUtils.toString(requestWithEntity.getEntity()));
+                HttpEntity entity = requestWithEntity.getEntity();
+                if (entity != null) {
+                    if (requestContentType.get().startsWith(ContentType.MULTIPART_FORM_DATA.getMimeType())) {
+                        HttpEntity wrappedEntity = (HttpEntity) getFieldValue(entity, "wrappedEntity");
+                        RestAssuredMultiPartEntity multiPartEntity = (RestAssuredMultiPartEntity) wrappedEntity;
+                        MultipartEntityBuilder multipartEntityBuilder = (MultipartEntityBuilder) getFieldValue(multiPartEntity, "builder");
+                        List<FormBodyPart> bodyParts = (List<FormBodyPart>) getFieldValue(multipartEntityBuilder, "bodyParts");
+                        StringBuffer sb = new StringBuffer();
+                        for(FormBodyPart bodyPart : bodyParts) {
+                            // TODO
+                        }
+
+                    } else {
+                        formData = Optional.of(EntityUtils.toString(entity));
+                    }
                 }
             } catch (IOException e) {
                 log.error("Failed to consume form data (entity) from HTTP request", e);
@@ -147,6 +167,8 @@ public class Http2Curl {
         command.add("--compressed");
         return command.stream().collect(Collectors.joining(" "));
     }
+
+
 
     private static String getOriginalRequestUri(HttpRequest request) {
         if (request instanceof HttpRequestWrapper) {
@@ -244,6 +266,29 @@ public class Http2Curl {
             return code < 16 ? "\\x0" + codeAsHex : "\\x" + codeAsHex;
         }
         return "\\u" + ("" + codeAsHex).substring(codeAsHex.length(), 4);
+    }
+
+
+
+    private static <T> Object getFieldValue(T obj, String fieldName) throws NoSuchFieldException, IllegalAccessException {
+        Field f = getField(obj.getClass(), fieldName);
+        f.setAccessible(true);
+        return f.get(obj);
+    }
+
+
+    private static Field getField(Class clazz, String fieldName)
+            throws NoSuchFieldException {
+        try {
+            return clazz.getDeclaredField(fieldName);
+        } catch (NoSuchFieldException e) {
+            Class superClass = clazz.getSuperclass();
+            if (superClass == null) {
+                throw e;
+            } else {
+                return getField(superClass, fieldName);
+            }
+        }
     }
 
 }
