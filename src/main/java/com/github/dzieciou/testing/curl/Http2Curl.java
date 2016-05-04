@@ -135,6 +135,18 @@ public class Http2Curl {
             command.add(request.getRequestLine().getMethod());
         }
 
+
+      headers.stream()
+                .filter(h -> isBasicAuthentication(h))
+                .forEach(h -> {
+                    command.add("-u");
+                    command.add(escapeString(getBasicAuthCredentials(h.getValue())));
+                });
+
+        headers = headers.stream().filter(h -> !isBasicAuthentication(h)).collect(Collectors.toList());
+
+
+
         headers
                 .stream()
                 .filter(h -> !ignoredHeaders.contains(h.getName()))
@@ -146,6 +158,15 @@ public class Http2Curl {
         command.addAll(data);
         command.add("--compressed");
         return command.stream().collect(Collectors.joining(" "));
+    }
+
+    private static boolean isBasicAuthentication(Header h) {
+        return h.getName().equals("Authorization") && h.getValue().startsWith("Basic");
+    }
+
+    private static String getBasicAuthCredentials(String basicAuth) {
+        String credentials = basicAuth.replaceAll("Basic ", "");
+        return new String(Base64.getDecoder().decode(credentials));
     }
 
     private static String getOriginalRequestUri(HttpRequest request) {

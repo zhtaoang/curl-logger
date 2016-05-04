@@ -9,6 +9,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicNameValuePair;
 import org.testng.annotations.Test;
 
+import java.util.Base64;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -20,9 +21,22 @@ public class Http2CurlTest {
     @Test
     public void shouldPrintGetRequestProperly() throws Exception {
         HttpGet getRequest = new HttpGet("http://test.com:8080/items/query?x=y#z");
+
+
         assertThat("curl 'http://test.com:8080/items/query?x=y#z' --compressed",
                 equalTo(Http2Curl.generateCurl(getRequest)));
     }
+
+    @Test
+    public void shouldPrintBasicAuthnUserCredentials() throws Exception {
+        HttpGet getRequest = new HttpGet("http://test.com:8080/items/query?x=y#z");
+        String encodedCredentials = Base64.getEncoder().encodeToString("xx:yy".getBytes());
+        getRequest.addHeader("Authorization", "Basic " + encodedCredentials);
+
+        assertThat("curl 'http://test.com:8080/items/query?x=y#z' -u 'xx:yy' --compressed",
+                equalTo(Http2Curl.generateCurl(getRequest)));
+    }
+
 
     @Test
     public void shouldPrintPostRequestProperly() throws Exception {
@@ -36,6 +50,8 @@ public class Http2CurlTest {
         assertThat("curl 'http://google.pl/' -H 'Content-Type: application/x-www-form-urlencoded' --data 'param1=param1_value&param2=param2_value' --compressed",
                 equalTo(Http2Curl.generateCurl(posttRequest)));
     }
+
+
 
     @Test
     public void shouldPrintPostRequestWithBinaryDataProperly() {
