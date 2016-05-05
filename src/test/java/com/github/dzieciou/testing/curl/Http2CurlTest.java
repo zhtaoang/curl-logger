@@ -9,11 +9,9 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicNameValuePair;
 import org.testng.annotations.Test;
 
-import java.io.File;
 import java.util.Base64;
 import java.util.List;
 
-import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
@@ -23,10 +21,8 @@ public class Http2CurlTest {
     @Test
     public void shouldPrintGetRequestProperly() throws Exception {
         HttpGet getRequest = new HttpGet("http://test.com:8080/items/query?x=y#z");
-
-
-        assertThat("curl 'http://test.com:8080/items/query?x=y#z' --compressed",
-                equalTo(Http2Curl.generateCurl(getRequest)));
+        assertThat(Http2Curl.generateCurl(getRequest),
+                equalTo("curl 'http://test.com:8080/items/query?x=y#z' --compressed --insecure --verbose"));
     }
 
     @Test
@@ -34,11 +30,9 @@ public class Http2CurlTest {
         HttpGet getRequest = new HttpGet("http://test.com:8080/items/query?x=y#z");
         String encodedCredentials = Base64.getEncoder().encodeToString("xx:yy".getBytes());
         getRequest.addHeader("Authorization", "Basic " + encodedCredentials);
-
-        assertThat("curl 'http://test.com:8080/items/query?x=y#z' -u 'xx:yy' --compressed",
-                equalTo(Http2Curl.generateCurl(getRequest)));
+        assertThat(Http2Curl.generateCurl(getRequest),
+                equalTo("curl 'http://test.com:8080/items/query?x=y#z' --user 'xx:yy' --compressed --insecure --verbose"));
     }
-
 
     @Test
     public void shouldPrintPostRequestProperly() throws Exception {
@@ -49,33 +43,27 @@ public class Http2CurlTest {
                 .build();
         posttRequest.setEntity(new UrlEncodedFormEntity(postParameters));
         posttRequest.setHeader("Content-Type", "application/x-www-form-urlencoded");
-        assertThat("curl 'http://google.pl/' -H 'Content-Type: application/x-www-form-urlencoded' --data 'param1=param1_value&param2=param2_value' --compressed",
-                equalTo(Http2Curl.generateCurl(posttRequest)));
+        assertThat(Http2Curl.generateCurl(posttRequest),
+                equalTo("curl 'http://google.pl/' -H 'Content-Type: application/x-www-form-urlencoded' --data 'param1=param1_value&param2=param2_value' --compressed --insecure --verbose"));
     }
-
-
 
     @Test
     public void shouldPrintPostRequestWithBinaryDataProperly() {
-     // TODO
-
-
+        // TODO
     }
-
-
 
     @Test
     public void shouldPrintDeleteRequestProperly() throws Exception {
         HttpDelete deleteRequest = new HttpDelete("http://test.com/items/12345");
-        assertThat("curl 'http://test.com/items/12345' -X DELETE --compressed",
-                equalTo(Http2Curl.generateCurl(deleteRequest)));
+        assertThat(Http2Curl.generateCurl(deleteRequest),
+                equalTo("curl 'http://test.com/items/12345' -X DELETE --compressed --insecure --verbose"));
     }
 
     @Test
     public void shouldPrintHeadRequestProperly() throws Exception {
         HttpHead headRequest = new HttpHead("http://test.com/items/12345");
-        assertThat("curl 'http://test.com/items/12345' -X HEAD --compressed",
-                equalTo(Http2Curl.generateCurl(headRequest)));
+        assertThat(Http2Curl.generateCurl(headRequest),
+                equalTo("curl 'http://test.com/items/12345' -X HEAD --compressed --insecure --verbose"));
     }
 
     @Test
@@ -83,8 +71,8 @@ public class Http2CurlTest {
         HttpPut putRequest = new HttpPut("http://test.com/items/12345");
         putRequest.setEntity(new StringEntity("details={\"name\":\"myname\",\"age\":\"20\"}"));
         putRequest.setHeader("Content-Type", "application/json");
-        assertThat("curl 'http://test.com/items/12345' -X PUT -H 'Content-Type: application/json' --data 'details={\"name\":\"myname\",\"age\":\"20\"}' --compressed",
-                equalTo(Http2Curl.generateCurl(putRequest)));
+        assertThat(Http2Curl.generateCurl(putRequest),
+                equalTo("curl 'http://test.com/items/12345' -X PUT -H 'Content-Type: application/json' --data 'details={\"name\":\"myname\",\"age\":\"20\"}' --compressed --insecure --verbose"));
     }
 
 }

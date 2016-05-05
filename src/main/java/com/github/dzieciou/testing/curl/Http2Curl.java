@@ -40,7 +40,6 @@ import org.apache.http.client.methods.HttpRequestWrapper;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.FormBodyPart;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.impl.client.EntityEnclosingRequestWrapper;
 import com.jayway.restassured.internal.multipart.*;
 import org.apache.http.impl.client.RequestWrapper;
 import org.apache.http.util.EntityUtils;
@@ -117,11 +116,13 @@ public class Http2Curl {
                 HttpEntity entity = requestWithEntity.getEntity();
                 if (entity != null) {
                     if (requestContentType.get().startsWith(ContentType.MULTIPART_FORM_DATA.getMimeType())) {
+
                         HttpEntity wrappedEntity = (HttpEntity) getFieldValue(entity, "wrappedEntity");
                         RestAssuredMultiPartEntity multiPartEntity = (RestAssuredMultiPartEntity) wrappedEntity;
                         MultipartEntityBuilder multipartEntityBuilder = (MultipartEntityBuilder) getFieldValue(multiPartEntity, "builder");
                         List<FormBodyPart> bodyParts = (List<FormBodyPart>) getFieldValue(multipartEntityBuilder, "bodyParts");
                         StringBuffer sb = new StringBuffer();
+
                         for(FormBodyPart bodyPart : bodyParts) {
                             // TODO
                         }
@@ -156,17 +157,18 @@ public class Http2Curl {
         }
 
 
-      headers.stream()
-                .filter(h -> isBasicAuthentication(h))
-                .forEach(h -> {
-                    command.add("-u");
-                    command.add(escapeString(getBasicAuthCredentials(h.getValue())));
-                });
+        headers = handleAuthenticationHeader(headers, command);
 
-        headers = headers.stream().filter(h -> !isBasicAuthentication(h)).collect(Collectors.toList());
+        handleNotIgnoredHeaders(headers, ignoredHeaders, command);
 
+        command.addAll(data);
+        command.add("--compressed");
+        command.add("--insecure");
+        command.add("--verbose");
+        return command.stream().collect(Collectors.joining(" "));
+    }
 
-
+    private static void handleNotIgnoredHeaders(List<Header> headers, Set<String> ignoredHeaders, List<String> command) {
         headers
                 .stream()
                 .filter(h -> !ignoredHeaders.contains(h.getName()))
@@ -174,10 +176,18 @@ public class Http2Curl {
                     command.add("-H");
                     command.add(escapeString(h.getName() + ": " + h.getValue()));
                 });
+    }
 
-        command.addAll(data);
-        command.add("--compressed");
-        return command.stream().collect(Collectors.joining(" "));
+    private static List<Header> handleAuthenticationHeader(List<Header> headers, List<String> command) {
+        headers.stream()
+                  .filter(h -> isBasicAuthentication(h))
+                  .forEach(h -> {
+                      command.add("--user");
+                      command.add(escapeString(getBasicAuthCredentials(h.getValue())));
+                  });
+
+        headers = headers.stream().filter(h -> !isBasicAuthentication(h)).collect(Collectors.toList());
+        return headers;
     }
 
     private static boolean isBasicAuthentication(Header h) {
