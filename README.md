@@ -30,7 +30,7 @@ This way testers and developers can quickly reproduce an issue and isolate its r
 
 ## Usage
 
-Latest snapshot:
+Latest release:
 
 ```xml
 <dependency>
