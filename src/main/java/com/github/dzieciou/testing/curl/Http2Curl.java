@@ -32,6 +32,7 @@
 package com.github.dzieciou.testing.curl;
 
 import com.google.common.collect.ImmutableSet;
+import com.jayway.restassured.internal.multipart.RestAssuredMultiPartEntity;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpEntityEnclosingRequest;
@@ -40,12 +41,13 @@ import org.apache.http.client.methods.HttpRequestWrapper;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.FormBodyPart;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
-import com.jayway.restassured.internal.multipart.*;
+import org.apache.http.entity.mime.content.ContentBody;
 import org.apache.http.impl.client.RequestWrapper;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.MalformedURLException;
@@ -116,16 +118,10 @@ public class Http2Curl {
                 HttpEntity entity = requestWithEntity.getEntity();
                 if (entity != null) {
                     if (requestContentType.get().startsWith(ContentType.MULTIPART_FORM_DATA.getMimeType())) {
+                        ignoredHeaders.add("Content-Type"); // let curl command decide
+                        ignoredHeaders.add("Content-Length");
+                        handleMultipartEntity(entity, command);
 
-                        HttpEntity wrappedEntity = (HttpEntity) getFieldValue(entity, "wrappedEntity");
-                        RestAssuredMultiPartEntity multiPartEntity = (RestAssuredMultiPartEntity) wrappedEntity;
-                        MultipartEntityBuilder multipartEntityBuilder = (MultipartEntityBuilder) getFieldValue(multiPartEntity, "builder");
-                        List<FormBodyPart> bodyParts = (List<FormBodyPart>) getFieldValue(multipartEntityBuilder, "bodyParts");
-                        StringBuffer sb = new StringBuffer();
-
-                        for(FormBodyPart bodyPart : bodyParts) {
-                            // TODO
-                        }
 
                     } else {
                         formData = Optional.of(EntityUtils.toString(entity));
@@ -168,6 +164,64 @@ public class Http2Curl {
         return command.stream().collect(Collectors.joining(" "));
     }
 
+    private static void handleMultipartEntity(HttpEntity entity, List<String> command) throws NoSuchFieldException, IllegalAccessException, IOException {
+        HttpEntity wrappedEntity = (HttpEntity) getFieldValue(entity, "wrappedEntity");
+        RestAssuredMultiPartEntity multiPartEntity = (RestAssuredMultiPartEntity) wrappedEntity;
+        MultipartEntityBuilder multipartEntityBuilder = (MultipartEntityBuilder) getFieldValue(multiPartEntity, "builder");
+
+        List<FormBodyPart> bodyParts = (List<FormBodyPart>) getFieldValue(multipartEntityBuilder, "bodyParts");
+
+        bodyParts.forEach(p -> handlePart(p, command));
+    }
+
+    private static void handlePart(FormBodyPart bodyPart, List<String> command) {
+        String contentDisposition = bodyPart.getHeader().getFields().stream()
+                .filter(f -> f.getName().equals("Content-Disposition"))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Multipart missing Content-Disposition header"))
+                .getBody();
+
+        List<String> elements = Arrays.asList(contentDisposition.split(";"));
+        Map<String, String> map = elements.stream().map(s -> s.trim().split("="))
+                .collect(Collectors.toMap(a -> a[0], a -> a.length == 2 ? a[1] : ""));
+
+        if (map.containsKey("form-data")) {
+            command.add("-F");
+
+            StringBuffer part = new StringBuffer();
+            part.append(removeQuotes(map.get("name"))).append("=");
+            if (map.get("filename") != null) {
+                part.append("@").append(removeQuotes(map.get("filename")));
+            } else {
+                try {
+                    part.append(getContent(bodyPart));
+                    part.append(";type=" + bodyPart.getHeader().getField("Content-Type").getBody());
+                } catch (IOException e) {
+                    throw new RuntimeException("Could not read content of the part", e);
+                }
+            }
+            command.add(escapeString(part.toString()));
+        } else {
+            throw new RuntimeException("Unsupported type " + map.entrySet().stream().findFirst().get());
+        }
+    }
+
+    private static String getContent(FormBodyPart bodyPart) throws IOException {
+        ContentBody content = bodyPart.getBody();
+        ByteArrayOutputStream out = new ByteArrayOutputStream((int) content.getContentLength());
+        content.writeTo(out);
+        return out.toString();
+    }
+
+    private static String removeQuotes(String s) {
+        return s.replaceAll("^\"|\"$", "");
+    }
+
+    private static String getBoundary(String contentType) {
+        String boundaryPart = contentType.split(";")[1];
+        return boundaryPart.split("=")[1];
+    }
+
     private static void handleNotIgnoredHeaders(List<Header> headers, Set<String> ignoredHeaders, List<String> command) {
         headers
                 .stream()
@@ -180,11 +234,11 @@ public class Http2Curl {
 
     private static List<Header> handleAuthenticationHeader(List<Header> headers, List<String> command) {
         headers.stream()
-                  .filter(h -> isBasicAuthentication(h))
-                  .forEach(h -> {
-                      command.add("--user");
-                      command.add(escapeString(getBasicAuthCredentials(h.getValue())));
-                  });
+                .filter(h -> isBasicAuthentication(h))
+                .forEach(h -> {
+                    command.add("--user");
+                    command.add(escapeString(getBasicAuthCredentials(h.getValue())));
+                });
 
         headers = headers.stream().filter(h -> !isBasicAuthentication(h)).collect(Collectors.toList());
         return headers;
@@ -198,7 +252,6 @@ public class Http2Curl {
         String credentials = basicAuth.replaceAll("Basic ", "");
         return new String(Base64.getDecoder().decode(credentials));
     }
-
 
 
     private static String getOriginalRequestUri(HttpRequest request) {
@@ -298,7 +351,6 @@ public class Http2Curl {
         }
         return "\\u" + ("" + codeAsHex).substring(codeAsHex.length(), 4);
     }
-
 
 
     private static <T> Object getFieldValue(T obj, String fieldName) throws NoSuchFieldException, IllegalAccessException {
