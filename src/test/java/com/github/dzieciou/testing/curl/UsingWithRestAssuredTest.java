@@ -22,6 +22,7 @@ import java.util.function.Consumer;
 import static com.jayway.restassured.RestAssured.config;
 import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.config.HttpClientConfig.httpClientConfig;
+import static com.jayway.restassured.config.MultiPartConfig.multiPartConfig;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockserver.integration.ClientAndServer.startClientAndServer;
@@ -81,7 +82,7 @@ public class UsingWithRestAssuredTest {
          .when().post("/");
         //@formatter:on
 
-        verify(curlConsumer).accept("curl 'http://localhost:9999/' -F 'file=@README.md' -F 'x=yyyyyyy;type=text/plain' -X POST -H 'Accept: */*' -H 'Host: localhost:9999' -H 'Connection: Keep-Alive' -H 'User-Agent: Apache-HttpClient/4.5.1 (Java/1.8.0_45)' --compressed --insecure --verbose");
+        verify(curlConsumer).accept("curl 'http://localhost:9999/' -F 'file=@README.md;type=application/octet-stream' -F 'x=yyyyyyy;type=text/plain' -X POST -H 'Accept: */*' -H 'Host: localhost:9999' -H 'Connection: Keep-Alive' -H 'User-Agent: Apache-HttpClient/4.5.1 (Java/1.8.0_45)' --compressed --insecure --verbose");
 
     }
 
@@ -96,18 +97,36 @@ public class UsingWithRestAssuredTest {
                 .port(MOCK_PORT)
                 .config(config()
                         .httpClient(httpClientConfig()
-                                .reuseHttpClientInstance().httpClientFactory(new MyHttpClientFactory(curlConsumer)))).
-                log().all()
+                                .reuseHttpClientInstance().httpClientFactory(new MyHttpClientFactory(curlConsumer))))
+                .log().all()
                 .multiPart("message", "{ content : \"interesting\" }", "application/json")
                 .when().post("/");
         //@formatter:on
 
         verify(curlConsumer).accept("curl 'http://localhost:9999/' -F 'message={ content : \"interesting\" };type=application/json' -X POST -H 'Accept: */*' -H 'Host: localhost:9999' -H 'Connection: Keep-Alive' -H 'User-Agent: Apache-HttpClient/4.5.1 (Java/1.8.0_45)' --compressed --insecure --verbose");
 
-
-        // TODO Mariusz example
-        // http://stackoverflow.com/questions/27231031/set-content-type-of-part-of-multipart-mixed-request-in-curl
     }
+
+
+    @Test
+    public void shouldPrintMultipartWithMixedType() {
+
+        Consumer<String> curlConsumer = mock(Consumer.class);
+
+        given()
+                .baseUri(MOCK_BASE_URI)
+                .port(MOCK_PORT)
+                .config(config()
+                        .httpClient(httpClientConfig()
+                                .reuseHttpClientInstance().httpClientFactory(new MyHttpClientFactory(curlConsumer)))
+                        .multiPartConfig(multiPartConfig().defaultSubtype("mixed")))
+                .log().all()
+                .multiPart("myfile", new File("README.md"), "application/json")
+                .when().post("/");
+
+        verify(curlConsumer).accept("curl 'http://localhost:9999/' -F 'myfile=@README.md;type=application/json' -X POST -H 'Accept: */*' -H 'Host: localhost:9999' -H 'Connection: Keep-Alive' -H 'User-Agent: Apache-HttpClient/4.5.1 (Java/1.8.0_45)' -H 'Content-Type: multipart/mixed' --compressed --insecure --verbose");
+    }
+
 
     private static class MyHttpClientFactory implements HttpClientConfig.HttpClientFactory {
 

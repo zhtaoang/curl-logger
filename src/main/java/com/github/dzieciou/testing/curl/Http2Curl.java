@@ -43,6 +43,7 @@ import org.apache.http.entity.mime.FormBodyPart;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.ContentBody;
 import org.apache.http.impl.client.RequestWrapper;
+import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -117,12 +118,15 @@ public class Http2Curl {
             try {
                 HttpEntity entity = requestWithEntity.getEntity();
                 if (entity != null) {
-                    if (requestContentType.get().startsWith(ContentType.MULTIPART_FORM_DATA.getMimeType())) {
+                    if (requestContentType.get().startsWith("multipart/form")) {
                         ignoredHeaders.add("Content-Type"); // let curl command decide
                         ignoredHeaders.add("Content-Length");
                         handleMultipartEntity(entity, command);
-
-
+                    } else if( (requestContentType.get().startsWith("multipart/mixed"))) {
+                        headers = headers.stream().filter(h -> ! h.getName().equals("Content-Type")).collect(Collectors.toList());
+                        headers.add(new BasicHeader("Content-Type", "multipart/mixed"));
+                        ignoredHeaders.add("Content-Length");
+                        handleMultipartEntity(entity, command);
                     } else {
                         formData = Optional.of(EntityUtils.toString(entity));
                     }
@@ -195,11 +199,11 @@ public class Http2Curl {
             } else {
                 try {
                     part.append(getContent(bodyPart));
-                    part.append(";type=" + bodyPart.getHeader().getField("Content-Type").getBody());
                 } catch (IOException e) {
                     throw new RuntimeException("Could not read content of the part", e);
                 }
             }
+            part.append(";type=" + bodyPart.getHeader().getField("Content-Type").getBody());
             command.add(escapeString(part.toString()));
         } else {
             throw new RuntimeException("Unsupported type " + map.entrySet().stream().findFirst().get());
