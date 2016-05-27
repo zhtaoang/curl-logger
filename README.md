@@ -87,6 +87,17 @@ using [logback][5]. Sample logback configuration that logs all CURL commands to 
 
 * JDK 8
 
+## Releases
+
+0.2:
+
+ * Support for multipart/mixed and multipart/form content types
+ * Now all generated curl commands are "--insecure --verbose"
+ 
+0.1:
+
+ * Support for logging basic operations
+
 ## Bugs and features request
 
 Report or request in [JIRA][2].
