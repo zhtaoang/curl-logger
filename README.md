@@ -1,16 +1,6 @@
 # CURL Logger
 
-Logs each HTTP request sent by the Apache HTTP client as a [CURL][1] command.
-
-The following HTTP request
-```java  
-HttpGet getRequest = new HttpGet("http://google.com");
-createHttpClient().execute(getRequest);
-```
-will be logged as:
-```
-curl 'http://google.com/' --compressed 
-```
+Logs each HTTP request sent by REST Assured as a [CURL][1] command.
 
 The following request from REST-Assured test
 ```java  
