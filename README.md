@@ -26,13 +26,9 @@ Latest release:
 <dependency>
   <groupId>com.github.dzieciou.testing</groupId>
   <artifactId>curl-logger</artifactId>
-  <version>0.1</version>
+  <version>0.2</version>
 </dependency>
 ```
-
-Available from this repository: 
-
-    https://oss.sonatype.org/content/repositories/snapshots/
    
 ### Using with REST-Assured client 
     
