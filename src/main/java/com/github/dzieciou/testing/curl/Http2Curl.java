@@ -159,6 +159,10 @@ public class Http2Curl {
 
         headers = handleAuthenticationHeader(headers, command);
 
+        // cookies
+        headers = handleCookieHeaders(command, headers);
+
+
         handleNotIgnoredHeaders(headers, ignoredHeaders, command);
 
         command.addAll(data);
@@ -166,6 +170,26 @@ public class Http2Curl {
         command.add("--insecure");
         command.add("--verbose");
         return command.stream().collect(Collectors.joining(" "));
+    }
+
+    private static List<Header> handleCookieHeaders(List<String> command, List<Header> headers) {
+        List<Header> cookiesHeaders = headers.stream()
+                .filter(h -> h.getName().equals("Cookie"))
+                .collect(Collectors.toList());
+        cookiesHeaders.forEach(h -> handleCookiesHeader(h, command));
+        headers = headers.stream().filter(h -> !h.getName().equals("Cookie")).collect(Collectors.toList());
+        return headers;
+    }
+
+    private static void handleCookiesHeader(Header header, List<String> command) {
+        List<String> cookies = Arrays.asList(header.getValue().split(";"));
+        cookies.forEach(c -> handleCookie(c.trim(), command));
+    }
+
+    private static void handleCookie(String cookie, List<String> command) {
+        String[] nameAndValue = cookie.split("=");
+        command.add("-b");
+        command.add(String.format("%s=%s", nameAndValue[0], nameAndValue[1]));
     }
 
     private static void handleMultipartEntity(HttpEntity entity, List<String> command) throws NoSuchFieldException, IllegalAccessException, IOException {
