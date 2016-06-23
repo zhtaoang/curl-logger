@@ -72,8 +72,28 @@ using [logback][5]. Sample logback configuration that logs all CURL commands to 
 ## Prerequisities
 
 * JDK 8
+* Dependencies
+
+```xml
+<dependency>
+    <groupId>org.apache.httpcomponents</groupId>
+    <artifactId>httpclient</artifactId>
+    <version>4.5.1</version>
+</dependency>
+<dependency>
+    <groupId>com.jayway.restassured</groupId>
+    <artifactId>rest-assured</artifactId>
+    <version>2.8.0</version>
+</dependency>
+```
 
 ## Releases
+
+0.3:
+
+ * Each cookie is now defined with "-b" option instead of -"H"
+ * Removed heavy dependencies like Guava
+ * Libraries like REST-Assured and Apache must be now provided by the user (didn't want to constrain users to a specific version)
 
 0.2:
 

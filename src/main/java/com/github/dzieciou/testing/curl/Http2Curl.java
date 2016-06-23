@@ -31,14 +31,12 @@
 
 package com.github.dzieciou.testing.curl;
 
-import com.google.common.collect.ImmutableSet;
 import com.jayway.restassured.internal.multipart.RestAssuredMultiPartEntity;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpRequest;
 import org.apache.http.client.methods.HttpRequestWrapper;
-import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.FormBodyPart;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.ContentBody;
@@ -65,10 +63,9 @@ public class Http2Curl {
 
     private static final Logger log = LoggerFactory.getLogger(Http2Curl.class);
 
-    private static final Set<String> nonBinaryContentTypes = ImmutableSet.<String>builder()
-            .add("application/x-www-form-urlencoded")
-            .add("application/json")
-            .build();
+    private static final List<String> nonBinaryContentTypes = Arrays.asList(new String[] {
+            "application/x-www-form-urlencoded",
+            "application/json" });
 
     /**
      * Generates CURL command for a given HTTP request.
