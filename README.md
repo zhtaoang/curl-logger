@@ -89,7 +89,7 @@ using [logback][5]. Sample logback configuration that logs all CURL commands to 
 
 ## Releases
 
-0.3:
+0.3-SNAPHOST:
 
  * Each cookie is now defined with "-b" option instead of -"H"
  * Removed heavy dependencies like Guava
