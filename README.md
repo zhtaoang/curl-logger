@@ -72,7 +72,7 @@ using [logback][5]. Sample logback configuration that logs all CURL commands to 
 ## Prerequisities
 
 * JDK 8
-* Dependencies
+* Dependencies with which I tested the solution
 
 ```xml
 <dependency>
