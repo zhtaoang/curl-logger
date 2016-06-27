@@ -1,7 +1,6 @@
 package com.github.dzieciou.testing.curl;
 
 
-import com.google.common.collect.ImmutableList;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.*;
@@ -9,6 +8,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicNameValuePair;
 import org.testng.annotations.Test;
 
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
@@ -37,10 +37,10 @@ public class Http2CurlTest {
     @Test
     public void shouldPrintPostRequestProperly() throws Exception {
         HttpPost posttRequest = new HttpPost("http://google.pl/");
-        List<NameValuePair> postParameters = ImmutableList.<NameValuePair>builder()
-                .add(new BasicNameValuePair("param1", "param1_value"))
-                .add(new BasicNameValuePair("param2", "param2_value"))
-                .build();
+        List<NameValuePair> postParameters = new ArrayList<>();
+        postParameters.add(new BasicNameValuePair("param1", "param1_value"));
+        postParameters.add(new BasicNameValuePair("param2", "param2_value"));
+
         posttRequest.setEntity(new UrlEncodedFormEntity(postParameters));
         posttRequest.setHeader("Content-Type", "application/x-www-form-urlencoded");
         assertThat(Http2Curl.generateCurl(posttRequest),
