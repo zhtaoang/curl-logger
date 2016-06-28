@@ -18,7 +18,7 @@ public class UsingWithHttpClientTest {
 
     private static HttpClient createHttpClient() {
         return HttpClientBuilder.create()
-                .addInterceptorFirst(new CurlLoggingInterceptor())
+                .addInterceptorFirst(CurlLoggingInterceptor.builder().build())
                 .build();
     }
 }

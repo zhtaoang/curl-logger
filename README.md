@@ -26,7 +26,7 @@ Latest release:
 <dependency>
   <groupId>com.github.dzieciou.testing</groupId>
   <artifactId>curl-logger</artifactId>
-  <version>0.2</version>
+  <version>0.3</version>
 </dependency>
 ```
    
@@ -39,7 +39,7 @@ private static class MyHttpClientFactory implements HttpClientConfig.HttpClientF
   @Override
   public HttpClient createHttpClient() {
     AbstractHttpClient client = new DefaultHttpClient();
-    client.addRequestInterceptor(new CurlLoggingInterceptor());
+    client.addRequestInterceptor(CurlLoggingInterceptor.defaultBuilder().build());
     return client;
   }
 }
@@ -69,6 +69,17 @@ using [logback][5]. Sample logback configuration that logs all CURL commands to 
 </configuration>
 ```
 
+## Features
+
+### Logging stacktrace
+
+The library provides a way to log stacktrace where the curl generation was requested. You configure `CurlLoggingInterceptor`
+accordingly:
+
+```java
+CurlLoggingInterceptor.defaultBuilder().logStacktrace().build();
+```
+
 ## Prerequisities
 
 * JDK 8
@@ -94,6 +105,7 @@ using [logback][5]. Sample logback configuration that logs all CURL commands to 
  * Each cookie is now defined with "-b" option instead of -"H"
  * Removed heavy dependencies like Guava
  * Libraries like REST-Assured and Apache must be now provided by the user (didn't want to constrain users to a specific version)
+ * Can log stacktrace where curl generation was requested
 
 0.2:
 
