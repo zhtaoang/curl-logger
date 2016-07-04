@@ -2,6 +2,7 @@ package com.github.dzieciou.testing.curl;
 
 
 import com.jayway.restassured.config.HttpClientConfig;
+import com.jayway.restassured.config.RestAssuredConfig;
 import org.apache.http.HttpException;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpRequestInterceptor;
@@ -52,9 +53,7 @@ public class UsingWithRestAssuredTest {
                 .redirects().follow(false)
                 .baseUri( MOCK_BASE_URI)
                 .port(MOCK_PORT)
-                .config(config()
-                        .httpClient(httpClientConfig()
-                                .reuseHttpClientInstance().httpClientFactory(new MyHttpClientFactory(curlConsumer))))
+                .config(getRestAssuredConfig(curlConsumer))
         .when()
                 .get("/")
         .then()
@@ -73,17 +72,16 @@ public class UsingWithRestAssuredTest {
         given()
                 .baseUri(MOCK_BASE_URI)
                 .port(MOCK_PORT)
-                .config(config()
-                        .httpClient(httpClientConfig()
-                                .reuseHttpClientInstance().httpClientFactory(new MyHttpClientFactory(curlConsumer)))).
-                log().all()
-                .multiPart(new File("README.md")).formParam("x", "yyyyyyy")
+                .config(getRestAssuredConfig(curlConsumer))
+                .multiPart(new File("README.md"))
+                .formParam("parameterX", "parameterXValue")
          .when().post("/");
         //@formatter:on
 
-        verify(curlConsumer).accept("curl 'http://localhost:9999/' -F 'file=@README.md;type=application/octet-stream' -F 'x=yyyyyyy;type=text/plain' -X POST -H 'Accept: */*' -H 'Host: localhost:9999' -H 'Connection: Keep-Alive' -H 'User-Agent: Apache-HttpClient/4.5.2 (Java/1.8.0_45)' --compressed --insecure --verbose");
+        verify(curlConsumer).accept("curl 'http://localhost:9999/' -F 'file=@README.md;type=application/octet-stream' -F 'parameterX=parameterXValue;type=text/plain' -X POST -H 'Accept: */*' -H 'Host: localhost:9999' -H 'Connection: Keep-Alive' -H 'User-Agent: Apache-HttpClient/4.5.2 (Java/1.8.0_45)' --compressed --insecure --verbose");
 
     }
+
 
     @Test(groups = "end-to-end-samples")
     public void shouldPrintMultipartWithContentTypesForTypes() {
@@ -94,12 +92,9 @@ public class UsingWithRestAssuredTest {
         given()
                 .baseUri(MOCK_BASE_URI)
                 .port(MOCK_PORT)
-                .config(config()
-                        .httpClient(httpClientConfig()
-                                .reuseHttpClientInstance().httpClientFactory(new MyHttpClientFactory(curlConsumer))))
-                .log().all()
+                .config(getRestAssuredConfig(curlConsumer))
                 .multiPart("message", "{ content : \"interesting\" }", "application/json")
-                .when().post("/");
+        .when().post("/");
         //@formatter:on
 
         verify(curlConsumer).accept("curl 'http://localhost:9999/' -F 'message={ content : \"interesting\" };type=application/json' -X POST -H 'Accept: */*' -H 'Host: localhost:9999' -H 'Connection: Keep-Alive' -H 'User-Agent: Apache-HttpClient/4.5.2 (Java/1.8.0_45)' --compressed --insecure --verbose");
@@ -112,20 +107,24 @@ public class UsingWithRestAssuredTest {
 
         Consumer<String> curlConsumer = mock(Consumer.class);
 
+        //@formatter:off
         given()
                 .baseUri(MOCK_BASE_URI)
                 .port(MOCK_PORT)
-                .config(config()
-                        .httpClient(httpClientConfig()
-                                .reuseHttpClientInstance().httpClientFactory(new MyHttpClientFactory(curlConsumer)))
+                .config(getRestAssuredConfig(curlConsumer)
                         .multiPartConfig(multiPartConfig().defaultSubtype("mixed")))
-                .log().all()
                 .multiPart("myfile", new File("README.md"), "application/json")
-                .when().post("/");
+        .when().post("/");
+        //@formatter:on
 
         verify(curlConsumer).accept("curl 'http://localhost:9999/' -F 'myfile=@README.md;type=application/json' -X POST -H 'Accept: */*' -H 'Host: localhost:9999' -H 'Connection: Keep-Alive' -H 'User-Agent: Apache-HttpClient/4.5.2 (Java/1.8.0_45)' -H 'Content-Type: multipart/mixed' --compressed --insecure --verbose");
     }
 
+    private static RestAssuredConfig getRestAssuredConfig(Consumer<String> curlConsumer) {
+        return config()
+                .httpClient(httpClientConfig()
+                        .reuseHttpClientInstance().httpClientFactory(new MyHttpClientFactory(curlConsumer)));
+    }
 
     private static class MyHttpClientFactory implements HttpClientConfig.HttpClientFactory {
 
