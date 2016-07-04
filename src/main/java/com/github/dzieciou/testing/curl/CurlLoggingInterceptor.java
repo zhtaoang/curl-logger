@@ -13,14 +13,13 @@ import java.io.IOException;
 /**
  * Logs each HTTP request as CURL command in "curl" log.
  */
-
 public class CurlLoggingInterceptor implements HttpRequestInterceptor {
 
-    private static final Logger log = LoggerFactory.getLogger("curl");
+    private Logger log = LoggerFactory.getLogger("curl");
 
     private final boolean logStacktrace;
 
-    public static Builder builder() {
+    public static Builder defaultBuilder() {
         return new Builder();
     }
 
