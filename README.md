@@ -150,7 +150,6 @@ Report or request in [JIRA][2].
 * Chrome Web browser team has ["Copy as CURL"][7] in the network panel, similarly [Firebug add-on][8] for Firefox.
 * OkHttp client provides similar request [interceptor][3] to log HTTP requests as curl command. 
 * [Postman add-on][6] for Chrome provides a way to convert prepared requests as curl commands.
-, Ok2Http client
 
 
   [1]: https://curl.haxx.se/
