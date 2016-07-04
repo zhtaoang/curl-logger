@@ -42,6 +42,30 @@ public class UsingWithRestAssuredTest {
         mockServer.when(request()).respond(response());
     }
 
+    @Test(groups = "end-to-end-samples")
+    public void cookiesTest() {
+
+        Consumer<String> curlConsumer = mock(Consumer.class);
+
+        //@formatter:off
+        given()
+                .redirects().follow(false)
+                .baseUri( MOCK_BASE_URI)
+                .port(MOCK_PORT)
+                .cookie("token", "tokenValue")
+                .cookie("context", "contextValue")
+                .config(config()
+                        .httpClient(httpClientConfig()
+                                .reuseHttpClientInstance().httpClientFactory(new MyHttpClientFactory(curlConsumer))))
+        .when()
+                .get("/access")
+        .then()
+                .statusCode(200);
+        //@formatter:on
+
+        verify(curlConsumer).accept("curl 'http://localhost:" + MOCK_PORT + "/access' -b token=tokenValue -b context=contextValue -H 'Accept: */*' -H 'Content-Length: 0' -H 'Host: localhost:" + MOCK_PORT + "' -H 'Connection: Keep-Alive' -H 'User-Agent: Apache-HttpClient/4.5.1 (Java/1.8.0_45)' --compressed --insecure --verbose");
+    }
+
 
     @Test(groups = "end-to-end-samples")
     public void basicIntegrationTest() {
