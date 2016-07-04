@@ -43,13 +43,19 @@ private static class MyHttpClientFactory implements HttpClientConfig.HttpClientF
     return client;
   }
 }
-```    
+
+private static RestAssuredConfig restAssuredConfig() {
+  return config()
+          .httpClient(httpClientConfig()
+            .reuseHttpClientInstance().httpClientFactory(new MyHttpClientFactory()));
+}
+
+```   
+ 
 and use it in the test:
 ```java  
 given()
-  .config(config()
-    .httpClient(httpClientConfig()
-      .reuseHttpClientInstance().httpClientFactory(new MyHttpClientFactory())))
+  .config(createConfig())
 ...
 ```
 
@@ -73,11 +79,30 @@ using [logback][5]. Sample logback configuration that logs all CURL commands to 
 
 ### Logging stacktrace
 
-The library provides a way to log stacktrace where the curl generation was requested. You configure `CurlLoggingInterceptor`
-accordingly:
+If your test is sending multiple requests it might be hard to understand which REST-assured request generated a given 
+curl command. The library provides a way to log stacktrace where the curl generation was requested. You configure 
+`CurlLoggingInterceptor` accordingly:
 
 ```java
 CurlLoggingInterceptor.defaultBuilder().logStacktrace().build();
+```
+
+### Logging attached files
+
+When you attach files to your requests
+
+```java
+given()
+  .config(restAssuredConfig())
+  .baseUri("http://someHost.com")
+  .multiPart("myfile", new File("README.md"), "application/json")
+.when()
+  .post("/uploadFile");
+```
+
+the library will include reference to it instead of its content:
+```
+curl 'http://somehost.com/uploadFile' -F 'myfile=@README.md;type=application/json' -X POST ...
 ```
 
 ## Prerequisities
@@ -100,7 +125,7 @@ CurlLoggingInterceptor.defaultBuilder().logStacktrace().build();
 
 ## Releases
 
-0.3-SNAPSHOT:
+0.3:
 
  * Each cookie is now defined with "-b" option instead of -"H"
  * Removed heavy dependencies like Guava
