@@ -36,6 +36,12 @@ public class UsingWithRestAssuredTest {
     public static final String MOCK_BASE_URI = "http://" + MOCK_HOST;
     private MockServerClient mockServer;
 
+    private static RestAssuredConfig getRestAssuredConfig(Consumer<String> curlConsumer) {
+        return config()
+                .httpClient(httpClientConfig()
+                        .reuseHttpClientInstance().httpClientFactory(new MyHttpClientFactory(curlConsumer)));
+    }
+
     @BeforeClass
     public void setupMock() {
         mockServer = startClientAndServer(MOCK_PORT);
@@ -65,7 +71,6 @@ public class UsingWithRestAssuredTest {
 
         verify(curlConsumer).accept("curl 'http://localhost:" + MOCK_PORT + "/access' -b token=tokenValue -b context=contextValue -H 'Accept: */*' -H 'Content-Length: 0' -H 'Host: localhost:" + MOCK_PORT + "' -H 'Connection: Keep-Alive' -H 'User-Agent: Apache-HttpClient/4.5.2 (Java/1.8.0_45)' --compressed --insecure --verbose");
     }
-
 
     @Test(groups = "end-to-end-samples")
     public void basicIntegrationTest() {
@@ -106,7 +111,6 @@ public class UsingWithRestAssuredTest {
 
     }
 
-
     @Test(groups = "end-to-end-samples")
     public void shouldPrintMultipartWithContentTypesForTypes() {
 
@@ -124,7 +128,6 @@ public class UsingWithRestAssuredTest {
         verify(curlConsumer).accept("curl 'http://localhost:9999/' -F 'message={ content : \"interesting\" };type=application/json' -X POST -H 'Accept: */*' -H 'Host: localhost:9999' -H 'Connection: Keep-Alive' -H 'User-Agent: Apache-HttpClient/4.5.2 (Java/1.8.0_45)' --compressed --insecure --verbose");
 
     }
-
 
     @Test
     public void shouldPrintMultipartWithMixedType() {
@@ -144,10 +147,9 @@ public class UsingWithRestAssuredTest {
         verify(curlConsumer).accept("curl 'http://localhost:9999/' -F 'myfile=@README.md;type=application/json' -X POST -H 'Accept: */*' -H 'Host: localhost:9999' -H 'Connection: Keep-Alive' -H 'User-Agent: Apache-HttpClient/4.5.2 (Java/1.8.0_45)' -H 'Content-Type: multipart/mixed' --compressed --insecure --verbose");
     }
 
-    private static RestAssuredConfig getRestAssuredConfig(Consumer<String> curlConsumer) {
-        return config()
-                .httpClient(httpClientConfig()
-                        .reuseHttpClientInstance().httpClientFactory(new MyHttpClientFactory(curlConsumer)));
+    @AfterClass
+    public void closeMock() {
+        mockServer.stop();
     }
 
     private static class MyHttpClientFactory implements HttpClientConfig.HttpClientFactory {
@@ -182,11 +184,6 @@ public class UsingWithRestAssuredTest {
                 new RuntimeException(e);
             }
         }
-    }
-
-    @AfterClass
-    public void closeMock() {
-        mockServer.stop();
     }
 
 }

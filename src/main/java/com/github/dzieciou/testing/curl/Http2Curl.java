@@ -63,9 +63,9 @@ public class Http2Curl {
 
     private static final Logger log = LoggerFactory.getLogger(Http2Curl.class);
 
-    private static final List<String> nonBinaryContentTypes = Arrays.asList(new String[] {
+    private static final List<String> nonBinaryContentTypes = Arrays.asList(new String[]{
             "application/x-www-form-urlencoded",
-            "application/json" });
+            "application/json"});
 
     /**
      * Generates CURL command for a given HTTP request.
@@ -119,8 +119,8 @@ public class Http2Curl {
                         ignoredHeaders.add("Content-Type"); // let curl command decide
                         ignoredHeaders.add("Content-Length");
                         handleMultipartEntity(entity, command);
-                    } else if( (requestContentType.get().startsWith("multipart/mixed"))) {
-                        headers = headers.stream().filter(h -> ! h.getName().equals("Content-Type")).collect(Collectors.toList());
+                    } else if ((requestContentType.get().startsWith("multipart/mixed"))) {
+                        headers = headers.stream().filter(h -> !h.getName().equals("Content-Type")).collect(Collectors.toList());
                         headers.add(new BasicHeader("Content-Type", "multipart/mixed"));
                         ignoredHeaders.add("Content-Length");
                         handleMultipartEntity(entity, command);

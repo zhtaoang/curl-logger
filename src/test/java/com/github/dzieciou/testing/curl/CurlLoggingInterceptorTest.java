@@ -23,8 +23,6 @@ import static org.hamcrest.Matchers.*;
 import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
-import static uk.org.lidalia.slf4jtest.LoggingEvent.debug;
-import static uk.org.lidalia.slf4jtest.LoggingEvent.info;
 
 public class CurlLoggingInterceptorTest {
 
@@ -33,6 +31,12 @@ public class CurlLoggingInterceptorTest {
     public static final String MOCK_BASE_URI = "http://" + MOCK_HOST;
     private MockServerClient mockServer;
     private TestLogger log = TestLoggerFactory.getTestLogger("curl");
+
+    private static RestAssuredConfig getRestAssuredConfig(CurlLoggingInterceptor curlLoggingInterceptor) {
+        return config()
+                .httpClient(httpClientConfig()
+                        .reuseHttpClientInstance().httpClientFactory(new MyHttpClientFactory(curlLoggingInterceptor)));
+    }
 
     @BeforeClass
     public void setupMock() {
@@ -101,12 +105,6 @@ public class CurlLoggingInterceptorTest {
     @AfterClass
     public void stopMockServer() {
         mockServer.stop();
-    }
-
-    private static RestAssuredConfig getRestAssuredConfig(CurlLoggingInterceptor curlLoggingInterceptor) {
-        return config()
-                .httpClient(httpClientConfig()
-                        .reuseHttpClientInstance().httpClientFactory(new MyHttpClientFactory(curlLoggingInterceptor)));
     }
 
     private static class MyHttpClientFactory implements HttpClientConfig.HttpClientFactory {

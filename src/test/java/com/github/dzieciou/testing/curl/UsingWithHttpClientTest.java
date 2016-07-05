@@ -10,15 +10,15 @@ import java.io.IOException;
 
 public class UsingWithHttpClientTest {
 
-    @Test(groups = "end-to-end-samples")
-    public void test() throws IOException {
-        HttpGet getRequest = new HttpGet("http://google.com");
-        createHttpClient().execute(getRequest);
-    }
-
     private static HttpClient createHttpClient() {
         return HttpClientBuilder.create()
                 .addInterceptorFirst(CurlLoggingInterceptor.defaultBuilder().build())
                 .build();
+    }
+
+    @Test(groups = "end-to-end-samples")
+    public void test() throws IOException {
+        HttpGet getRequest = new HttpGet("http://google.com");
+        createHttpClient().execute(getRequest);
     }
 }

@@ -15,16 +15,22 @@ import java.io.IOException;
  */
 public class CurlLoggingInterceptor implements HttpRequestInterceptor {
 
+    private final boolean logStacktrace;
     private Logger log = LoggerFactory.getLogger("curl");
 
-    private final boolean logStacktrace;
+    private CurlLoggingInterceptor(Builder b) {
+        this.logStacktrace = b.logStacktrace;
+    }
 
     public static Builder defaultBuilder() {
         return new Builder();
     }
 
-    private CurlLoggingInterceptor(Builder b) {
-        this.logStacktrace = b.logStacktrace;
+    private static void printStacktrace(StringBuffer sb) {
+        StackTraceElement[] trace = Thread.currentThread().getStackTrace();
+        for (StackTraceElement traceElement : trace) {
+            sb.append("\tat " + traceElement + System.lineSeparator());
+        }
     }
 
     @Override
@@ -39,13 +45,6 @@ public class CurlLoggingInterceptor implements HttpRequestInterceptor {
             log.debug(message.toString());
         } catch (Exception e) {
             log.warn("Failed to generate CURL command for HTTP request", e);
-        }
-    }
-
-    private static void printStacktrace(StringBuffer sb) {
-        StackTraceElement[] trace = Thread.currentThread().getStackTrace();
-        for (StackTraceElement traceElement : trace) {
-            sb.append("\tat " + traceElement + System.lineSeparator());
         }
     }
 
