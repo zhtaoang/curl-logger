@@ -31,7 +31,7 @@
 
 package com.github.dzieciou.testing.curl;
 
-import com.jayway.restassured.internal.multipart.RestAssuredMultiPartEntity;
+import io.restassured.internal.multipart.RestAssuredMultiPartEntity;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpEntityEnclosingRequest;

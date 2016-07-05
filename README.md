@@ -89,7 +89,7 @@ CurlLoggingInterceptor.defaultBuilder().logStacktrace().build();
 
 ### Logging attached files
 
-When you attach files to your requests
+When you attach a file to your requests
 
 ```java
 given()
@@ -100,7 +100,7 @@ given()
   .post("/uploadFile");
 ```
 
-the library will include reference to it instead of its content:
+the library will include reference to it instead of pasting its content:
 ```
 curl 'http://somehost.com/uploadFile' -F 'myfile=@README.md;type=application/json' -X POST ...
 ```
@@ -114,16 +114,20 @@ curl 'http://somehost.com/uploadFile' -F 'myfile=@README.md;type=application/jso
 <dependency>
     <groupId>org.apache.httpcomponents</groupId>
     <artifactId>httpclient</artifactId>
-    <version>4.5.1</version>
+    <version>4.5.2</version>
 </dependency>
 <dependency>
-    <groupId>com.jayway.restassured</groupId>
+    <groupId>io.restassured</groupId>
     <artifactId>rest-assured</artifactId>
-    <version>2.8.0</version>
+    <version>3.0.0</version>
 </dependency>
 ```
 
 ## Releases
+
+0.4-SNAPHSHOT:
+ 
+ * Upgraded to REST-assured 3.0
 
 0.3:
 

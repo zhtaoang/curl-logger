@@ -1,7 +1,7 @@
 package com.github.dzieciou.testing.curl;
 
-import com.jayway.restassured.config.HttpClientConfig;
-import com.jayway.restassured.config.RestAssuredConfig;
+import io.restassured.config.HttpClientConfig;
+import io.restassured.config.RestAssuredConfig;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.AbstractHttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -15,9 +15,9 @@ import uk.org.lidalia.slf4jtest.LoggingEvent;
 import uk.org.lidalia.slf4jtest.TestLogger;
 import uk.org.lidalia.slf4jtest.TestLoggerFactory;
 
-import static com.jayway.restassured.RestAssured.config;
-import static com.jayway.restassured.RestAssured.given;
-import static com.jayway.restassured.config.HttpClientConfig.httpClientConfig;
+import static io.restassured.RestAssured.config;
+import static io.restassured.RestAssured.given;
+import static io.restassured.config.HttpClientConfig.httpClientConfig;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.mockserver.integration.ClientAndServer.startClientAndServer;
