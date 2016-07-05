@@ -26,7 +26,7 @@ Latest release:
 <dependency>
   <groupId>com.github.dzieciou.testing</groupId>
   <artifactId>curl-logger</artifactId>
-  <version>0.3</version>
+  <version>0.4</version>
 </dependency>
 ```
    
@@ -125,7 +125,7 @@ curl 'http://somehost.com/uploadFile' -F 'myfile=@README.md;type=application/jso
 
 ## Releases
 
-0.4-SNAPHSHOT:
+0.4:
  
  * Upgraded to REST-assured 3.0
 
