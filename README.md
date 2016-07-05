@@ -55,7 +55,7 @@ private static RestAssuredConfig restAssuredConfig() {
 and use it in the test:
 ```java  
 given()
-  .config(createConfig())
+  .config(restAssuredConfig())
 ...
 ```
 
