@@ -1,8 +1,8 @@
 # CURL Logger
 
-Logs each HTTP request sent by REST Assured as a [CURL][1] command.
+Logs each HTTP request sent by REST-assured as a [CURL][1] command.
 
-The following request from REST-Assured test
+The following request from REST-assured test
 ```java  
 given()
   .redirects().follow(false)
@@ -30,7 +30,7 @@ Latest release:
 </dependency>
 ```
    
-### Using with REST-Assured client 
+### Using with REST-assured client 
     
 When creating HTTP client instance, you must configure it to use `CurlLoggingInterceptor`:
     
@@ -133,7 +133,7 @@ curl 'http://somehost.com/uploadFile' -F 'myfile=@README.md;type=application/jso
 
  * Each cookie is now defined with "-b" option instead of -"H"
  * Removed heavy dependencies like Guava
- * Libraries like REST-Assured and Apache must be now provided by the user (didn't want to constrain users to a specific version)
+ * Libraries like REST-assured and Apache must be now provided by the user (didn't want to constrain users to a specific version)
  * Can log stacktrace where curl generation was requested
 
 0.2:
