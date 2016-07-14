@@ -125,6 +125,10 @@ curl 'http://somehost.com/uploadFile' -F 'myfile=@README.md;type=application/jso
 
 ## Releases
 
+0.5-SNAPSHOT:
+
+
+
 0.4:
  
  * Upgraded to REST-assured 3.0
