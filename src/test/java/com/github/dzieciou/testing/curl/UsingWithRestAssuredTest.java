@@ -3,6 +3,8 @@ package com.github.dzieciou.testing.curl;
 
 import io.restassured.config.HttpClientConfig;
 import io.restassured.config.RestAssuredConfig;
+import io.restassured.http.Cookie;
+import io.restassured.http.Cookies;
 import org.apache.http.HttpException;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpRequestInterceptor;
@@ -17,6 +19,8 @@ import org.testng.annotations.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 
 import static io.restassured.RestAssured.config;
@@ -60,6 +64,35 @@ public class UsingWithRestAssuredTest {
                 .port(MOCK_PORT)
                 .cookie("token", "tokenValue")
                 .cookie("context", "contextValue")
+                .config(config()
+                        .httpClient(httpClientConfig()
+                                .reuseHttpClientInstance().httpClientFactory(new MyHttpClientFactory(curlConsumer))))
+        .when()
+                .get("/access")
+        .then()
+                .statusCode(200);
+        //@formatter:on
+
+        verify(curlConsumer).accept("curl 'http://localhost:" + MOCK_PORT + "/access' -b token=tokenValue -b context=contextValue -H 'Accept: */*' -H 'Content-Length: 0' -H 'Host: localhost:" + MOCK_PORT + "' -H 'Connection: Keep-Alive' -H 'User-Agent: Apache-HttpClient/4.5.2 (Java/1.8.0_45)' --compressed --insecure --verbose");
+    }
+
+    @Test(groups = "end-to-end-samples")
+    public void customizedCookie() {
+
+        Consumer<String> curlConsumer = mock(Consumer.class);
+
+        List<Cookie> cookies = new ArrayList<>();
+        cookies.add(new Cookie.Builder("token", "tokenValue").setDomain("testing.com").setPath("/access").build());
+     //   cookies.add(new Cookie.Builder("context", "contextValue").setHttpOnly(true).build());
+
+
+        //@formatter:off
+        given()
+
+                .redirects().follow(false)
+                .baseUri( MOCK_BASE_URI)
+                .port(MOCK_PORT)
+                .cookies(new Cookies(cookies))
                 .config(config()
                         .httpClient(httpClientConfig()
                                 .reuseHttpClientInstance().httpClientFactory(new MyHttpClientFactory(curlConsumer))))
