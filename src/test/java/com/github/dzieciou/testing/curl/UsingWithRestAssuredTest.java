@@ -73,7 +73,7 @@ public class UsingWithRestAssuredTest {
                 .statusCode(200);
         //@formatter:on
 
-        verify(curlConsumer).accept("curl 'http://localhost:" + MOCK_PORT + "/access' -b token=tokenValue -b context=contextValue -H 'Accept: */*' -H 'Content-Length: 0' -H 'Host: localhost:" + MOCK_PORT + "' -H 'Connection: Keep-Alive' -H 'User-Agent: Apache-HttpClient/4.5.2 (Java/1.8.0_45)' --compressed --insecure --verbose");
+        verify(curlConsumer).accept("curl 'http://localhost:" + MOCK_PORT + "/access' -b 'token=tokenValue' -b 'context=contextValue' -H 'Accept: */*' -H 'Content-Length: 0' -H 'Host: localhost:" + MOCK_PORT + "' -H 'Connection: Keep-Alive' -H 'User-Agent: Apache-HttpClient/4.5.2 (Java/1.8.0_45)' --compressed --insecure --verbose");
     }
 
     @Test(groups = "end-to-end-samples")

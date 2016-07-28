@@ -179,14 +179,14 @@ public class Http2Curl {
     }
 
     private static void handleCookiesHeader(Header header, List<String> command) {
-        List<String> cookies = Arrays.asList(header.getValue().split(";"));
+        List<String> cookies = Arrays.asList(header.getValue().split("; "));
         cookies.forEach(c -> handleCookie(c.trim(), command));
     }
 
     private static void handleCookie(String cookie, List<String> command) {
         String[] nameAndValue = cookie.split("=");
         command.add("-b");
-        command.add(String.format("%s=%s", nameAndValue[0], nameAndValue[1]));
+        command.add(escapeString(String.format("%s=%s", nameAndValue[0], nameAndValue[1])));
     }
 
     private static void handleMultipartEntity(HttpEntity entity, List<String> command) throws NoSuchFieldException, IllegalAccessException, IOException {
