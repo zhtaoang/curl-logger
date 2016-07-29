@@ -184,7 +184,8 @@ public class Http2Curl {
     }
 
     private static void handleCookie(String cookie, List<String> command) {
-        String[] nameAndValue = cookie.split("=");
+        // Cookie value may contain "=" as well
+        String[] nameAndValue = cookie.split("=", 2);
         command.add("-b");
         command.add(escapeString(String.format("%s=%s", nameAndValue[0], nameAndValue[1])));
     }

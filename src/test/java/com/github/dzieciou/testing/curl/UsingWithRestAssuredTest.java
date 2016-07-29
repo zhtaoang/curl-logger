@@ -77,14 +77,39 @@ public class UsingWithRestAssuredTest {
     }
 
     @Test(groups = "end-to-end-samples")
+    public void cookieWithSpecialCharactersTest() {
+
+        Consumer<String> curlConsumer = mock(Consumer.class);
+
+        //@formatter:off
+        given()
+                .redirects().follow(false)
+                .baseUri( MOCK_BASE_URI)
+                .port(MOCK_PORT)
+                .cookie("token1", "1-XQLTiKxwRNyUpJYkr+IV2g==-+nLy/6GiMDj7SW/jN107UGmpf4hsM7IXsXdN9z/+7dyljV5N+0Pqpg/da0XIGOgSt2mMIIStakcjGyPlEq30Wx2gvYmVadkmH7gmcSGcaBupjlcKM2Fio96AbzJVjxUUsE5jvjBI8YlyX8fMiesQ8Gbt8XhEGbJKJe4/ogMDn7Qv687DQraxGewISOu5VIQuhgztTDqa2OUCgObG94wtAo3lSo+7HSbxcbM0LNKbbqA=-5GVOIPO4SZ7m8E0DtLS1E76h0LOmzWN00iiIeWZz360=")
+                .cookie("token2", "2-XQLTiKxwRNyUpJYkr+IV2g==-+nLy/6GiMDj7SW/jN107UGmpf4hsM7IXsXdN9z/+7dyljV5N+0Pqpg/da0XIGOgSt2mMIIStakcjGyPlEq30Wx2gvYmVadkmH7gmcSGcaBupjlcKM2Fio96AbzJVjxUUsE5jvjBI8YlyX8fMiesQ8Gbt8XhEGbJKJe4/ogMDn7Qv687DQraxGewISOu5VIQuhgztTDqa2OUCgObG94wtAo3lSo+7HSbxcbM0LNKbbqA=-5GVOIPO4SZ7m8E0DtLS1E76h0LOmzWN00iiIeWZz360=")
+                .config(config()
+                        .httpClient(httpClientConfig()
+                                .reuseHttpClientInstance().httpClientFactory(new MyHttpClientFactory(curlConsumer))))
+        .when()
+                .get("/access")
+        .then()
+                .statusCode(200);
+        //@formatter:on
+
+        verify(curlConsumer).accept("curl 'http://localhost:" + MOCK_PORT + "/access' " +
+                "-b 'token1=1-XQLTiKxwRNyUpJYkr+IV2g==-+nLy/6GiMDj7SW/jN107UGmpf4hsM7IXsXdN9z/+7dyljV5N+0Pqpg/da0XIGOgSt2mMIIStakcjGyPlEq30Wx2gvYmVadkmH7gmcSGcaBupjlcKM2Fio96AbzJVjxUUsE5jvjBI8YlyX8fMiesQ8Gbt8XhEGbJKJe4/ogMDn7Qv687DQraxGewISOu5VIQuhgztTDqa2OUCgObG94wtAo3lSo+7HSbxcbM0LNKbbqA=-5GVOIPO4SZ7m8E0DtLS1E76h0LOmzWN00iiIeWZz360=' " +
+                "-b 'token2=2-XQLTiKxwRNyUpJYkr+IV2g==-+nLy/6GiMDj7SW/jN107UGmpf4hsM7IXsXdN9z/+7dyljV5N+0Pqpg/da0XIGOgSt2mMIIStakcjGyPlEq30Wx2gvYmVadkmH7gmcSGcaBupjlcKM2Fio96AbzJVjxUUsE5jvjBI8YlyX8fMiesQ8Gbt8XhEGbJKJe4/ogMDn7Qv687DQraxGewISOu5VIQuhgztTDqa2OUCgObG94wtAo3lSo+7HSbxcbM0LNKbbqA=-5GVOIPO4SZ7m8E0DtLS1E76h0LOmzWN00iiIeWZz360=' " +
+                "-H 'Accept: */*' -H 'Content-Length: 0' -H 'Host: localhost:" + MOCK_PORT + "' -H 'Connection: Keep-Alive' -H 'User-Agent: Apache-HttpClient/4.5.2 (Java/1.8.0_45)' --compressed --insecure --verbose");
+    }
+
+    @Test(groups = "end-to-end-samples")
     public void customizedCookie() {
 
         Consumer<String> curlConsumer = mock(Consumer.class);
 
         List<Cookie> cookies = new ArrayList<>();
         cookies.add(new Cookie.Builder("token", "tokenValue").setDomain("testing.com").setPath("/access").build());
-     //   cookies.add(new Cookie.Builder("context", "contextValue").setHttpOnly(true).build());
-
 
         //@formatter:off
         given()
