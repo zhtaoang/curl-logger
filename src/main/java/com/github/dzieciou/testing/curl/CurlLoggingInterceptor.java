@@ -18,7 +18,7 @@ public class CurlLoggingInterceptor implements HttpRequestInterceptor {
     private final boolean logStacktrace;
     private Logger log = LoggerFactory.getLogger("curl");
 
-    private CurlLoggingInterceptor(Builder b) {
+    protected CurlLoggingInterceptor(Builder b) {
         this.logStacktrace = b.logStacktrace;
     }
 
