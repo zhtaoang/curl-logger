@@ -105,6 +105,32 @@ the library will include reference to it instead of pasting its content:
 curl 'http://somehost.com/uploadFile' -F 'myfile=@README.md;type=application/json' -X POST ...
 ```
 
+### Printing command in multiple lines
+
+For leggibility reasons you may want to print your command in multiple lines:
+```
+curl 'http://google.pl/' \ 
+  -H 'Content-Type: application/x-www-form-urlencoded' \ 
+  --data 'param1=param1_value&param2=param2_value' \ 
+  --compressed \ 
+  --insecure \ 
+  --verbose
+```
+or in Windows:
+```
+curl 'http://google.pl/' ^ 
+  -H 'Content-Type: application/x-www-form-urlencoded' ^ 
+  --data 'param1=param1_value&param2=param2_value' ^ 
+  --compressed ^ 
+  --insecure ^ 
+  --verbose
+```
+To achieve this configure your `CurlLoggingInterceptor` as follows:
+```java
+CurlLoggingInterceptor.defaultBuilder().printMultiner().build();
+```
+By default `CurlLoggingInterceptor` prints curl command in a single line.
+
 ## Prerequisities
 
 * JDK 8
@@ -131,6 +157,7 @@ curl 'http://somehost.com/uploadFile' -F 'myfile=@README.md;type=application/jso
 * Fixed bug: cookie values can have = sign inside so we need to get around them somehow
 * Cookie strings are now escaped
 * CurlLoggingInterceptor's constructor is now protected to make extending it possible 
+* CurlLoggingInterceptor can now be configured to print a curl command in multiple lines
  
 
 0.4:

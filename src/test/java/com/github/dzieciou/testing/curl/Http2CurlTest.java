@@ -70,4 +70,18 @@ public class Http2CurlTest {
                 equalTo("curl 'http://test.com/items/12345' -X PUT -H 'Content-Type: application/json' --data 'details={\"name\":\"myname\",\"age\":\"20\"}' --compressed --insecure --verbose"));
     }
 
+    @Test
+    public void shouldPrintMultilineRequestProperly() throws Exception {
+        HttpPost posttRequest = new HttpPost("http://google.pl/");
+        List<NameValuePair> postParameters = new ArrayList<>();
+        postParameters.add(new BasicNameValuePair("param1", "param1_value"));
+        postParameters.add(new BasicNameValuePair("param2", "param2_value"));
+
+        posttRequest.setEntity(new UrlEncodedFormEntity(postParameters));
+        posttRequest.setHeader("Content-Type", "application/x-www-form-urlencoded");
+
+        assertThat(Http2Curl.generateCurl(posttRequest, true),
+                equalTo("curl 'http://google.pl/' \\\n  -H 'Content-Type: application/x-www-form-urlencoded' \\\n  --data 'param1=param1_value&param2=param2_value' \\\n  --compressed \\\n  --insecure \\\n  --verbose"));
+    }
+
 }

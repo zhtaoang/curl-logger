@@ -16,10 +16,12 @@ import java.io.IOException;
 public class CurlLoggingInterceptor implements HttpRequestInterceptor {
 
     private final boolean logStacktrace;
+    private final boolean printMultiliner;
     private Logger log = LoggerFactory.getLogger("curl");
 
     protected CurlLoggingInterceptor(Builder b) {
         this.logStacktrace = b.logStacktrace;
+        this.printMultiliner = b.printMultiliner;
     }
 
     public static Builder defaultBuilder() {
@@ -36,7 +38,7 @@ public class CurlLoggingInterceptor implements HttpRequestInterceptor {
     @Override
     public void process(HttpRequest request, HttpContext context) throws HttpException, IOException {
         try {
-            String curl = Http2Curl.generateCurl(request);
+            String curl = Http2Curl.generateCurl(request, printMultiliner);
             StringBuffer message = new StringBuffer(curl);
             if (logStacktrace) {
                 message.append(String.format("%n\tgenerated%n"));
@@ -51,6 +53,7 @@ public class CurlLoggingInterceptor implements HttpRequestInterceptor {
     public static class Builder {
 
         private boolean logStacktrace = false;
+        private boolean printMultiliner = false;
 
         public Builder logStacktrace() {
             logStacktrace = true;
@@ -59,6 +62,22 @@ public class CurlLoggingInterceptor implements HttpRequestInterceptor {
 
         public Builder dontLogStacktrace() {
             logStacktrace = false;
+            return this;
+        }
+
+        /**
+         * Configures {@code CurlLoggingInterceptor} to print a curl command in multiple lines.
+         */
+        public Builder printMultiliner() {
+            printMultiliner = true;
+            return this;
+        }
+
+        /**
+         * Configures {@code CurlLoggingInterceptor} to print a curl command in a single line.
+         */
+        public Builder printSingleliner() {
+            printMultiliner = false;
             return this;
         }
 

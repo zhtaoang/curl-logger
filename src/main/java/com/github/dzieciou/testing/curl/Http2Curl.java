@@ -53,6 +53,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.*;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 
@@ -68,19 +69,29 @@ public class Http2Curl {
             "application/json"});
 
     /**
-     * Generates CURL command for a given HTTP request.
+     * Generates single-line CURL command for a given HTTP request.
      *
      * @param request HTTP request
      * @return CURL command
      * @throws Exception if failed to generate CURL command
      */
     public static String generateCurl(HttpRequest request) throws Exception {
+        return generateCurl(request, false);
+    }
 
-        List<String> command = new ArrayList<>();
+    /**
+     * Generates CURL command for a given HTTP request.
+     *
+     * @param request HTTP request
+     * @param printMultiliner if {@code true} breaks command into lines for better legibility
+     * @return CURL command
+     * @throws Exception if failed to generate CURL command
+     */
+    public static String generateCurl(HttpRequest request, boolean printMultiliner) throws Exception {
+
+        List<List<String>> command = new ArrayList<>();  // Multi-line command
         Set<String> ignoredHeaders = new HashSet<>();
         List<Header> headers = Arrays.asList(request.getAllHeaders());
-
-        command.add("curl");
 
         String inferredUri = request.getRequestLine().getUri();
         if (!isValidUrl(inferredUri)) { // Missing schema and domain name
@@ -103,7 +114,10 @@ public class Http2Curl {
                                 .replaceAll("(?<!http(s)?:)//", "/");
             }
         }
-        command.add(escapeString(inferredUri).replaceAll("[[{}\\\\]]", "\\$&"));
+
+        command.add(line(
+                "curl",
+                escapeString(inferredUri).replaceAll("[[{}\\\\]]", "\\$&")));
 
         String inferredMethod = "GET";
         List<String> data = new ArrayList<>();
@@ -149,8 +163,9 @@ public class Http2Curl {
         }
 
         if (!request.getRequestLine().getMethod().equals(inferredMethod)) {
-            command.add("-X");
-            command.add(request.getRequestLine().getMethod());
+            command.add(line(
+                    "-X",
+                    request.getRequestLine().getMethod()));
         }
 
 
@@ -162,14 +177,33 @@ public class Http2Curl {
 
         handleNotIgnoredHeaders(headers, ignoredHeaders, command);
 
-        command.addAll(data);
-        command.add("--compressed");
-        command.add("--insecure");
-        command.add("--verbose");
-        return command.stream().collect(Collectors.joining(" "));
+        if (! data.isEmpty()) {
+            command.add(data);
+        }
+        command.add(line("--compressed"));
+        command.add(line("--insecure"));
+        command.add(line("--verbose"));
+
+        return command.stream()
+                .map(line -> line.stream().collect(Collectors.joining(" ")))
+                .collect(Collectors.joining(chooseJoiningString(printMultiliner)));
     }
 
-    private static List<Header> handleCookieHeaders(List<String> command, List<Header> headers) {
+    private static CharSequence chooseJoiningString(boolean printMultiliner) {
+        return printMultiliner
+                ? String.format(" %s%n  ", commandLineSeparator())
+                : " ";
+    }
+
+    private static String commandLineSeparator() {
+        return isOsWindows() ? "^" : "\\";
+    }
+
+    private static List<String> line(String... arguments) {
+        return Arrays.asList(arguments);
+    }
+
+    private static List<Header> handleCookieHeaders(List<List<String>> command, List<Header> headers) {
         List<Header> cookiesHeaders = headers.stream()
                 .filter(h -> h.getName().equals("Cookie"))
                 .collect(Collectors.toList());
@@ -178,19 +212,20 @@ public class Http2Curl {
         return headers;
     }
 
-    private static void handleCookiesHeader(Header header, List<String> command) {
+    private static void handleCookiesHeader(Header header, List<List<String>> command) {
         List<String> cookies = Arrays.asList(header.getValue().split("; "));
         cookies.forEach(c -> handleCookie(c.trim(), command));
     }
 
-    private static void handleCookie(String cookie, List<String> command) {
+    private static void handleCookie(String cookie, List<List<String>> command) {
         // Cookie value may contain "=" as well
         String[] nameAndValue = cookie.split("=", 2);
-        command.add("-b");
-        command.add(escapeString(String.format("%s=%s", nameAndValue[0], nameAndValue[1])));
+        command.add(line(
+                "-b",
+                escapeString(String.format("%s=%s", nameAndValue[0], nameAndValue[1]))));
     }
 
-    private static void handleMultipartEntity(HttpEntity entity, List<String> command) throws NoSuchFieldException, IllegalAccessException, IOException {
+    private static void handleMultipartEntity(HttpEntity entity, List<List<String>> command) throws NoSuchFieldException, IllegalAccessException, IOException {
         HttpEntity wrappedEntity = (HttpEntity) getFieldValue(entity, "wrappedEntity");
         RestAssuredMultiPartEntity multiPartEntity = (RestAssuredMultiPartEntity) wrappedEntity;
         MultipartEntityBuilder multipartEntityBuilder = (MultipartEntityBuilder) getFieldValue(multiPartEntity, "builder");
@@ -200,7 +235,7 @@ public class Http2Curl {
         bodyParts.forEach(p -> handlePart(p, command));
     }
 
-    private static void handlePart(FormBodyPart bodyPart, List<String> command) {
+    private static void handlePart(FormBodyPart bodyPart, List<List<String>> command) {
         String contentDisposition = bodyPart.getHeader().getFields().stream()
                 .filter(f -> f.getName().equals("Content-Disposition"))
                 .findFirst()
@@ -212,7 +247,6 @@ public class Http2Curl {
                 .collect(Collectors.toMap(a -> a[0], a -> a.length == 2 ? a[1] : ""));
 
         if (map.containsKey("form-data")) {
-            command.add("-F");
 
             StringBuffer part = new StringBuffer();
             part.append(removeQuotes(map.get("name"))).append("=");
@@ -226,7 +260,9 @@ public class Http2Curl {
                 }
             }
             part.append(";type=" + bodyPart.getHeader().getField("Content-Type").getBody());
-            command.add(escapeString(part.toString()));
+            command.add(line(
+                    "-F",
+                    escapeString(part.toString())));
         } else {
             throw new RuntimeException("Unsupported type " + map.entrySet().stream().findFirst().get());
         }
@@ -248,22 +284,24 @@ public class Http2Curl {
         return boundaryPart.split("=")[1];
     }
 
-    private static void handleNotIgnoredHeaders(List<Header> headers, Set<String> ignoredHeaders, List<String> command) {
+    private static void handleNotIgnoredHeaders(List<Header> headers, Set<String> ignoredHeaders, List<List<String>> command) {
         headers
                 .stream()
                 .filter(h -> !ignoredHeaders.contains(h.getName()))
                 .forEach(h -> {
-                    command.add("-H");
-                    command.add(escapeString(h.getName() + ": " + h.getValue()));
+                    command.add(line(
+                            "-H",
+                            escapeString(h.getName() + ": " + h.getValue())));
                 });
     }
 
-    private static List<Header> handleAuthenticationHeader(List<Header> headers, List<String> command) {
+    private static List<Header> handleAuthenticationHeader(List<Header> headers, List<List<String>> command) {
         headers.stream()
                 .filter(h -> isBasicAuthentication(h))
                 .forEach(h -> {
-                    command.add("--user");
-                    command.add(escapeString(getBasicAuthCredentials(h.getValue())));
+                    command.add(line(
+                            "--user",
+                            escapeString(getBasicAuthCredentials(h.getValue()))));
                 });
 
         headers = headers.stream().filter(h -> !isBasicAuthentication(h)).collect(Collectors.toList());
