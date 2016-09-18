@@ -127,7 +127,11 @@ curl 'http://somehost.com/uploadFile' -F 'myfile=@README.md;type=application/jso
 
 0.5-SNAPSHOT:
 
-
+* Upgraded to REST-assured 3.0.1 that contains important fix impacting curl-logger: Cookie attributes are no longer sent in request in accordance with RFC6265. 
+* Fixed bug: cookie values can have = sign inside so we need to get around them somehow
+* Cookie strings are now escaped
+* CurlLoggingInterceptor's constructor is now protected to make extending it possible 
+ 
 
 0.4:
  
