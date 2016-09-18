@@ -151,7 +151,7 @@ By default `CurlLoggingInterceptor` prints curl command in a single line.
 
 ## Releases
 
-0.5-SNAPSHOT:
+0.5:
 
 * Upgraded to REST-assured 3.0.1 that contains important fix impacting curl-logger: Cookie attributes are no longer sent in request in accordance with RFC6265. 
 * Fixed bug: cookie values can have = sign inside so we need to get around them somehow
