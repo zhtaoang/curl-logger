@@ -26,7 +26,7 @@ Latest release:
 <dependency>
   <groupId>com.github.dzieciou.testing</groupId>
   <artifactId>curl-logger</artifactId>
-  <version>0.4</version>
+  <version>0.5</version>
 </dependency>
 ```
    
