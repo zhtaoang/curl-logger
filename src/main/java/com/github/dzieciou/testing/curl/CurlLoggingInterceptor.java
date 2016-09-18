@@ -55,11 +55,17 @@ public class CurlLoggingInterceptor implements HttpRequestInterceptor {
         private boolean logStacktrace = false;
         private boolean printMultiliner = false;
 
+        /**
+         * Configures {@code CurlLoggingInterceptor} to print a stacktrace where curl command has been generated.
+         */
         public Builder logStacktrace() {
             logStacktrace = true;
             return this;
         }
 
+        /**
+         * Configures {@code CurlLoggingInterceptor} to not print a stacktrace where curl command has been generated.
+         */
         public Builder dontLogStacktrace() {
             logStacktrace = false;
             return this;
