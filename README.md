@@ -127,7 +127,7 @@ curl 'http://google.pl/' ^
 ```
 To achieve this configure your `CurlLoggingInterceptor` as follows:
 ```java
-CurlLoggingInterceptor.defaultBuilder().printMultiner().build();
+CurlLoggingInterceptor.defaultBuilder().printMultiliner().build();
 ```
 By default `CurlLoggingInterceptor` prints curl command in a single line.
 
@@ -145,7 +145,7 @@ By default `CurlLoggingInterceptor` prints curl command in a single line.
 <dependency>
     <groupId>io.restassured</groupId>
     <artifactId>rest-assured</artifactId>
-    <version>3.0.0</version>
+    <version>3.0.1</version>
 </dependency>
 ```
 
