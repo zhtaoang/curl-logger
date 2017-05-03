@@ -73,7 +73,7 @@ public class UsingWithRestAssuredTest {
                 .statusCode(200);
         //@formatter:on
 
-        verify(curlConsumer).accept("curl 'http://localhost:" + MOCK_PORT + "/access' -b 'token=tokenValue' -b 'context=contextValue' -H 'Accept: */*' -H 'Content-Length: 0' -H 'Host: localhost:" + MOCK_PORT + "' -H 'Connection: Keep-Alive' -H 'User-Agent: Apache-HttpClient/4.5.2 (Java/1.8.0_45)' --compressed --insecure --verbose");
+        verify(curlConsumer).accept("curl 'http://localhost:" + MOCK_PORT + "/access' -b 'token=tokenValue' -b 'context=contextValue' -H 'Accept: */*' -H 'Content-Length: 0' -H 'Host: localhost:" + MOCK_PORT + "' -H 'Connection: Keep-Alive' -H 'User-Agent: Apache-HttpClient/4.5.2 (Java/1.8.0_121)' --compressed --insecure --verbose");
     }
 
     @Test(groups = "end-to-end-samples")
@@ -100,7 +100,7 @@ public class UsingWithRestAssuredTest {
         verify(curlConsumer).accept("curl 'http://localhost:" + MOCK_PORT + "/access' " +
                 "-b 'token1=1-XQLTiKxwRNyUpJYkr+IV2g==-+nLy/6GiMDj7SW/jN107UGmpf4hsM7IXsXdN9z/+7dyljV5N+0Pqpg/da0XIGOgSt2mMIIStakcjGyPlEq30Wx2gvYmVadkmH7gmcSGcaBupjlcKM2Fio96AbzJVjxUUsE5jvjBI8YlyX8fMiesQ8Gbt8XhEGbJKJe4/ogMDn7Qv687DQraxGewISOu5VIQuhgztTDqa2OUCgObG94wtAo3lSo+7HSbxcbM0LNKbbqA=-5GVOIPO4SZ7m8E0DtLS1E76h0LOmzWN00iiIeWZz360=' " +
                 "-b 'token2=2-XQLTiKxwRNyUpJYkr+IV2g==-+nLy/6GiMDj7SW/jN107UGmpf4hsM7IXsXdN9z/+7dyljV5N+0Pqpg/da0XIGOgSt2mMIIStakcjGyPlEq30Wx2gvYmVadkmH7gmcSGcaBupjlcKM2Fio96AbzJVjxUUsE5jvjBI8YlyX8fMiesQ8Gbt8XhEGbJKJe4/ogMDn7Qv687DQraxGewISOu5VIQuhgztTDqa2OUCgObG94wtAo3lSo+7HSbxcbM0LNKbbqA=-5GVOIPO4SZ7m8E0DtLS1E76h0LOmzWN00iiIeWZz360=' " +
-                "-H 'Accept: */*' -H 'Content-Length: 0' -H 'Host: localhost:" + MOCK_PORT + "' -H 'Connection: Keep-Alive' -H 'User-Agent: Apache-HttpClient/4.5.2 (Java/1.8.0_45)' --compressed --insecure --verbose");
+                "-H 'Accept: */*' -H 'Content-Length: 0' -H 'Host: localhost:" + MOCK_PORT + "' -H 'Connection: Keep-Alive' -H 'User-Agent: Apache-HttpClient/4.5.2 (Java/1.8.0_121)' --compressed --insecure --verbose");
     }
 
     @Test(groups = "end-to-end-samples")
@@ -127,7 +127,7 @@ public class UsingWithRestAssuredTest {
                 .statusCode(200);
         //@formatter:on
 
-        verify(curlConsumer).accept("curl 'http://localhost:" + MOCK_PORT + "/access' -b 'token=tokenValue' -H 'Accept: */*' -H 'Content-Length: 0' -H 'Host: localhost:" + MOCK_PORT + "' -H 'Connection: Keep-Alive' -H 'User-Agent: Apache-HttpClient/4.5.2 (Java/1.8.0_45)' --compressed --insecure --verbose");
+        verify(curlConsumer).accept("curl 'http://localhost:" + MOCK_PORT + "/access' -b 'token=tokenValue' -H 'Accept: */*' -H 'Content-Length: 0' -H 'Host: localhost:" + MOCK_PORT + "' -H 'Connection: Keep-Alive' -H 'User-Agent: Apache-HttpClient/4.5.2 (Java/1.8.0_121)' --compressed --insecure --verbose");
     }
 
     @Test(groups = "end-to-end-samples")
@@ -147,7 +147,7 @@ public class UsingWithRestAssuredTest {
                 .statusCode(200);
         //@formatter:on
 
-        verify(curlConsumer).accept("curl 'http://localhost:" + MOCK_PORT + "/' -H 'Accept: */*' -H 'Content-Length: 0' -H 'Host: localhost:" + MOCK_PORT + "' -H 'Connection: Keep-Alive' -H 'User-Agent: Apache-HttpClient/4.5.2 (Java/1.8.0_45)' --compressed --insecure --verbose");
+        verify(curlConsumer).accept("curl 'http://localhost:" + MOCK_PORT + "/' -H 'Accept: */*' -H 'Content-Length: 0' -H 'Host: localhost:" + MOCK_PORT + "' -H 'Connection: Keep-Alive' -H 'User-Agent: Apache-HttpClient/4.5.2 (Java/1.8.0_121)' --compressed --insecure --verbose");
     }
 
     @Test(groups = "end-to-end-samples")
@@ -165,7 +165,7 @@ public class UsingWithRestAssuredTest {
          .when().post("/");
         //@formatter:on
 
-        verify(curlConsumer).accept("curl 'http://localhost:9999/' -F 'file=@README.md;type=application/octet-stream' -F 'parameterX=parameterXValue;type=text/plain' -X POST -H 'Accept: */*' -H 'Host: localhost:9999' -H 'Connection: Keep-Alive' -H 'User-Agent: Apache-HttpClient/4.5.2 (Java/1.8.0_45)' --compressed --insecure --verbose");
+        verify(curlConsumer).accept("curl 'http://localhost:9999/' -F 'file=@README.md;type=application/octet-stream' -F 'parameterX=parameterXValue;type=text/plain' -X POST -H 'Accept: */*' -H 'Host: localhost:9999' -H 'Connection: Keep-Alive' -H 'User-Agent: Apache-HttpClient/4.5.2 (Java/1.8.0_121)' --compressed --insecure --verbose");
 
     }
 
@@ -183,7 +183,7 @@ public class UsingWithRestAssuredTest {
         .when().post("/");
         //@formatter:on
 
-        verify(curlConsumer).accept("curl 'http://localhost:9999/' -F 'message={ content : \"interesting\" };type=application/json' -X POST -H 'Accept: */*' -H 'Host: localhost:9999' -H 'Connection: Keep-Alive' -H 'User-Agent: Apache-HttpClient/4.5.2 (Java/1.8.0_45)' --compressed --insecure --verbose");
+        verify(curlConsumer).accept("curl 'http://localhost:9999/' -F 'message={ content : \"interesting\" };type=application/json' -X POST -H 'Accept: */*' -H 'Host: localhost:9999' -H 'Connection: Keep-Alive' -H 'User-Agent: Apache-HttpClient/4.5.2 (Java/1.8.0_121)' --compressed --insecure --verbose");
 
     }
 
@@ -202,7 +202,7 @@ public class UsingWithRestAssuredTest {
         .when().post("/");
         //@formatter:on
 
-        verify(curlConsumer).accept("curl 'http://localhost:9999/' -F 'myfile=@README.md;type=application/json' -X POST -H 'Accept: */*' -H 'Host: localhost:9999' -H 'Connection: Keep-Alive' -H 'User-Agent: Apache-HttpClient/4.5.2 (Java/1.8.0_45)' -H 'Content-Type: multipart/mixed' --compressed --insecure --verbose");
+        verify(curlConsumer).accept("curl 'http://localhost:9999/' -F 'myfile=@README.md;type=application/json' -X POST -H 'Accept: */*' -H 'Host: localhost:9999' -H 'Connection: Keep-Alive' -H 'User-Agent: Apache-HttpClient/4.5.2 (Java/1.8.0_121)' -H 'Content-Type: multipart/mixed' --compressed --insecure --verbose");
     }
 
     @AfterClass
